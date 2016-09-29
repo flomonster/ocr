@@ -6,10 +6,11 @@
 struct s_network
 {
 	int lol;
-}
+};
+
 typedef struct s_network network;
 
-char ocr(bmp img)
+char ocr(GtkImage *img)
 {
 	return 'a';
 }
@@ -21,5 +22,6 @@ void save(char *path, network n)
 
 network load(char *path)
 {
-	return network n;
+	network n;
+	return n;
 }

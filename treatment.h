@@ -1,7 +1,7 @@
-typedef gtk.gdk.Image bmp;
+# include <gtk/gtk.h>
 
-bmp greyscale(bmp);
+GtkImage* greyscale(GtkImage*);
 
-bmp resize(bmp);
+GtkImage* resize(GtkImage*);
 
-bmp loadimg(char*);
+GtkImage* loading(char*);

@@ -2,19 +2,17 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
-typedef gtk.gdk.Image bmp;
-
-bmp greyscale(bmp img)
+GtkImage* greyscale(GtkImage *img)
 {
 	return img;
 }
 
-bmp resize(bmp img)
+GtkImage* resize(GtkImage *img)
 {
 	return img;
 }
 
-bmp loadimg(char *path)
+GtkImage* loadimg(char *path)
 {
 	return 0;
 }
