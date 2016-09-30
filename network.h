@@ -1,10 +1,29 @@
-#include <gtk/gtk.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-struct s_network;
+struct s_network
+{
+  // TO DO
+  int lol;
+};
+
 typedef struct s_network network;
 
-char ocr(GtkImage*);
+network new_network(int nbinput, int nboutput)
+{
+  // TO DO
+  network n;
+  return n;
+} 
 
-void save(char*, network);
+network load(char *path)
+{
+  // TO DO
+  network n;
+  return n;
+}
 
-network load(char*);
+void save(char *path, network n)
+{
+  // TO DO
+}

@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <gtk/gtk.h>
+#include "bmp.h"
 #include "network.h"
 
-int start()
+char ocr(bmp *img)
 {
-	return 0;
+  // TO DO
+  return 'a';
 }
