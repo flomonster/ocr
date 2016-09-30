@@ -22,12 +22,12 @@ struct S_BITMAP
 {
   unsigned width;
   unsigned height;
-  color *content;
+  COLOR *content;
 };
 
 typedef struct S_BITMAP BITMAP;
 
-BITMAP newBitmap(unsigned int width, unsigned int height, color *content)
+BITMAP newBitmap(unsigned int width, unsigned int height, COLOR *content)
 {
   BITMAP img;
   img.width = width;
@@ -61,4 +61,6 @@ void resize(BITMAP *img)
 BITMAP loading(char *path)
 {
   // TO DO
+  BITMAP img;
+  return img;
 }
