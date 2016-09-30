@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "bmp.h"
+#include "bitmap.h"
 #include "network.h"
 
-char ocr(bmp *img)
+char ocr(BITMAP *img)
 {
   // TO DO
   return 'a';
