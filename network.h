@@ -1,29 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct s_network
+struct S_NETWORK
 {
   // TO DO
-  int lol;
 };
 
-typedef struct s_network network;
+typedef struct S_NETWORK NETWORK;
 
-network new_network(int nbinput, int nboutput)
+NETWORK newNetwork(int nbinput, int nboutput)
 {
   // TO DO
-  network n;
+  NETWORK n;
   return n;
 } 
 
-network load(char *path)
+NETWORK loadNetwork(char *path)
 {
   // TO DO
-  network n;
+  NETWORK n;
   return n;
 }
 
-void save(char *path, network n)
+void saveNetwork(char *path, NETWORK n)
 {
   // TO DO
 }
