@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include "network.h"
+#include "ocr.h"
 
 int start()
 {
