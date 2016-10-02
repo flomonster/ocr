@@ -1,28 +1,26 @@
+#ifndef NETWORK_H_INCLUDED
+#define NETWORK_H_INCLUDED
 #include <stdio.h>
 #include <stdlib.h>
 
 struct S_NETWORK
 {
-  // TO DO
+  unsigned nblayer;
+  unsigned *layers;
+  float **treshold;
+  float **out;
+  float **delta;
+  float ***weight;
 };
 
 typedef struct S_NETWORK NETWORK;
 
-NETWORK newNetwork(int nbinput, int nboutput)
-{
-  // TO DO
-  NETWORK n;
-  return n;
-} 
+NETWORK newNetwork(unsigned  nblayer, unsigned *layers);
 
-NETWORK loadNetwork(char *path)
-{
-  // TO DO
-  NETWORK n;
-  return n;
-}
+void freeNetwork(NETWORK *n);
 
-void saveNetwork(char *path, NETWORK n)
-{
-  // TO DO
-}
+NETWORK loadNetwork(char *path);
+
+void saveNetwork(char *path, NETWORK n);
+
+#endif
