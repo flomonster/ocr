@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct S_NETWORK
+struct s_network
 {
   unsigned nblayer;
   unsigned *layers;
@@ -13,14 +13,14 @@ struct S_NETWORK
   float ***weight;
 };
 
-typedef struct S_NETWORK NETWORK;
+typedef struct s_network network;
 
-NETWORK newNetwork(unsigned  nblayer, unsigned *layers);
+network newNetwork(unsigned  nblayer, unsigned *layers);
 
-void freeNetwork(NETWORK *n);
+void freeNetwork(network *n);
 
-NETWORK loadNetwork(char *path);
+network loadNetwork(char *path);
 
-void saveNetwork(char *path, NETWORK n);
+void saveNetwork(char *path, network n);
 
 #endif

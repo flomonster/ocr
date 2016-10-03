@@ -3,9 +3,9 @@
 #include "network.h"
 
 // Generate a neural network
-NETWORK newNetwork(unsigned  nblayer, unsigned *layers)
+network newNetwork(unsigned  nblayer, unsigned *layers)
 {
-  NETWORK n;
+  network n;
 
   float **t = (float **) malloc(sizeof(float *) * (nblayer - 1));
   for (unsigned i = 1; i < nblayer; i++)
@@ -59,15 +59,15 @@ NETWORK newNetwork(unsigned  nblayer, unsigned *layers)
 } 
 
 // Free the memory used by a neural network
-void freeNetwork(NETWORK *n)
+void freeNetwork(network *n)
 {
-  for (int i = 0; i < n->nblayer - 1; i++)
+  for (unsigned i = 0; i < n->nblayer - 1; i++)
     free(n->treshold[i]);
   free(n->treshold);
   for (unsigned i = 0; i < n->nblayer; i++)
     free(n->out[i]);
   free(n->out);
-  for (int i = 0; i < n->nblayer - 1; i++)
+  for (unsigned i = 0; i < n->nblayer - 1; i++)
     free(n->delta[i]);
   free(n->delta);
   for (unsigned i = 0; i < n->nblayer - 1; i++)
@@ -79,14 +79,14 @@ void freeNetwork(NETWORK *n)
   free(n->weight);
 }
 
-NETWORK loadNetwork(char *path)
+network loadNetwork(char *path)
 {
   // TO DO
-  NETWORK n;
+  network n;
   return n;
 }
 
-void saveNetwork(char *path, NETWORK n)
+void saveNetwork(char *path, network n)
 {
   // TO DO
 }
