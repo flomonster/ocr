@@ -3,7 +3,8 @@
 //#include "bitmap.h"
 #include "network.h"
 
-void feedForward(NETWORK *, float *);
+float sigmoid(float);
+void feedForward(network *, float *);
 
 //char ocr(BITMAP *);
 
