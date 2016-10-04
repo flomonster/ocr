@@ -4,7 +4,10 @@
 #include "network.h"
 
 float sigmoid(float);
+
 void feedForward(network *, float *);
+
+void backPropagation(network *, float *);
 
 //char ocr(BITMAP *);
 

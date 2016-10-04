@@ -1,9 +1,9 @@
 # Compilers and options
 CC=gcc
-CPPFLAGS= -MMD
-CFLAGS= -Wall -Wextra -std=c99 -O2 `pkg-config --cflags --libs gtk+-3.0` -lm
+CPPFLAGS= -MMD 
+CFLAGS= -Wall -Wextra -lm -std=c99 -O2 `pkg-config --cflags --libs gtk+-3.0`
 LDFLAGS=
-LDLIBS=
+LDLIBS= -lm
  
 SRC = main.c ocr.c network.c graphical.c
 OBJ = ${SRC:.c=.o}
