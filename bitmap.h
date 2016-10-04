@@ -4,40 +4,40 @@
 # include <stdlib.h>
 
 #pragma pack(push, 1)
-struct S_COLOR
+struct s_color
 {
   unsigned char r;
   unsigned char g;
   unsigned char b;
 };
 #pragma pack(pop)
-typedef struct S_COLOR COLOR;
+typedef struct s_color color;
 
-COLOR newColor(unsigned char, unsigned char, unsigned char);
+color newColor(unsigned char, unsigned char, unsigned char);
 
 #pragma pack(push, 1)
-struct S_BITMAP
+struct s_bitmap
 {
   unsigned width;
   unsigned height;
-  COLOR *content;
+  color *content;
 };
 #pragma pack(pop)
-typedef struct S_BITMAP BITMAP;
+typedef struct s_bitmap bitmap;
 
-BITMAP newBitmap(unsigned, unsigned, COLOR *);
+bitmap newBitmap(unsigned, unsigned, color *);
 
-struct S_BITMAPFILEHEADER;
-typedef struct S_BITMAPFILEHEADER BITMAPFILEHEADER;
+struct s_bitmapFileHeader;
+typedef struct s_bitmapFileHeader bitmapFileHeader;
 
-struct S_BITMAPINFOHEADER;
-typedef struct S_BITMAPINFOHEADER BITMAPINFOHEADER;
+struct s_bitmapInfoHeader;
+typedef struct s_bitmapInfoHeader bitmapInfoHeader;
 
-void draw(BITMAP *img);
+void draw(bitmap *img);
 
-void binarize(BITMAP *img);
+void binarize(bitmap *img);
 
-void resize(BITMAP *img);
+void resize(bitmap *img);
 
-BITMAP loadBmp(char *path);
+bitmap loadBmp(char *path);
 #endif

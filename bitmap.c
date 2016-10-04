@@ -4,18 +4,18 @@
 # include "bitmap.h"
 
 
-COLOR newColor(unsigned char r, unsigned char g, unsigned char b)
+color newColor(unsigned char r, unsigned char g, unsigned char b)
 {
-  COLOR col;
+  color col;
   col.r = r;
   col.g = g;
   col.b = b;
   return col;
 }
 
-BITMAP newBitmap(unsigned width, unsigned height, COLOR *content)
+bitmap newBitmap(unsigned width, unsigned height, color *content)
 {
-  BITMAP img;
+  bitmap img;
   img.width = width;
   img.height = height;
   img.content = content;
@@ -23,7 +23,7 @@ BITMAP newBitmap(unsigned width, unsigned height, COLOR *content)
 }
 
 # pragma pack(push, 1)
-struct S_BITMAPFILEHEADER
+struct s_bitmapFileHeader
 {
 	uint16_t bfType;  
 	uint32_t bfSize;  
@@ -32,14 +32,14 @@ struct S_BITMAPFILEHEADER
 	uint32_t bfOffBits;  
 };
 # pragma pack(pop)
-typedef struct S_BITMAPFILEHEADER BITMAPFILEHEADER;
+typedef struct s_bitmapFileHeader bitmapFileHeader;
 
 # pragma pack(push, 1)
-struct S_BITMAPINFOHEADER
+struct s_bitmapInfoHeader
 {
 	uint32_t biSize;
-	uint64_t biWidth;  
-	uint64_t biHeight; 
+	uint32_t biWidth;
+	uint32_t biHeight;
 	uint16_t biPlanes;
 	uint16_t biBitCount;
 	uint32_t biCompression;
@@ -50,9 +50,9 @@ struct S_BITMAPINFOHEADER
 	uint32_t biClrImportant;
 };
 # pragma pack(pop)
-typedef struct S_BITMAPINFOHEADER BITMAPINFOHEADER;
+typedef struct s_bitmapInfoHeader bitmapInfoHeader;
 
-void draw(BITMAP *img)
+void draw(bitmap *img)
 {
   for (unsigned i = 0; i < img->width * img->height; i++)
   {
@@ -64,87 +64,39 @@ void draw(BITMAP *img)
   printf("\n");
 }
 
-void binarize(BITMAP *img)
+/*void binarize(bitmap *img)
 {
   // TO DO
 }
 
-void resize(BITMAP *img)
+void resize(bitmap *img)
 {
   // TO DO
-}
+}*/
 
-BITMAP loadBmp(char *path)
+bitmap loadBmp(char *path)
 {
-	FILE *filePtr;
-	BITMAPINFOHEADER bitmapInfoHeader;
-  BITMAPFILEHEADER bitmapFileHeader;
-	BITMAP bitmap;
-  filePtr = fopen(path, "rb");
+	FILE *fp = fopen(path, "rb");
+	bitmapFileHeader fileHeader;
+	bitmapInfoHeader infoHeader;
+	bitmap bmp;
+	
+	fread(&fileHeader, sizeof(bitmapFileHeader), 1, fp);
+	fread(&infoHeader, sizeof(bitmapInfoHeader), 1, fp);
+	fseek(fp, fileHeader.bfOffBits, SEEK_SET);
 
-  /*if (filePtr == NULL)
-		return NULL;*/
+	bmp.width = infoHeader.biWidth;
+	bmp.height = infoHeader.biHeight;
+	bmp.content = malloc(sizeof(color) * bmp.width * bmp.height);
+	unsigned char *pixel = malloc(3 * bmp.width * bmp.height);
+	fread(pixel, 3 * bmp.width * bmp.height, 1, fp);
 
-  fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, filePtr);
-	/*printf("%d \n", bitmapFileHeader.bfType);
-	printf("%d \n", bitmapFileHeader.bfSize);
-	printf("%d \n", bitmapFileHeader.bfReserved1);
-	printf("%d \n", bitmapFileHeader.bfReserved2);
-	printf("%d \n", bitmapFileHeader.bfOffBits);*/
-  /*if (bitmapFileHeader.bfType !=0x4D42)
-  {
-		fclose(filePtr);
-		return NULL;
-  }*/
-
-  fread(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, filePtr); 
-	printf("%d \n", bitmapInfoHeader.biSize);
-  printf("%d \n", bitmapInfoHeader.biWidth);
-  printf("%d \n", bitmapInfoHeader.biHeight);
-  printf("%d \n", bitmapInfoHeader.biPlanes);
-  printf("%d \n", bitmapInfoHeader.biBitCount);
-	printf("%d \n", bitmapInfoHeader.biCompression);
-  printf("%d \n", bitmapInfoHeader.biSizeImage);
-  printf("%d \n", bitmapInfoHeader.biXPelsPerMeter);
-  printf("%d \n", bitmapInfoHeader.biYPelsPerMeter);
-  printf("%d \n", bitmapInfoHeader.biClrUsed);
-	printf("%d \n", bitmapInfoHeader.biClrImportant);
-
-
-
-
-
-
-	fseek(filePtr, bitmapFileHeader.bfOffBits, SEEK_SET);
-	bitmap.width = bitmapInfoHeader.biWidth;
-	bitmap.height = bitmapInfoHeader.biHeight;
-	bitmap.content = malloc(sizeof(COLOR) * (bitmap.width * bitmap.height));
-	unsigned char *pixel = malloc(sizeof(char) * (bitmap.width * bitmap.height * 3)); 
-  printf("%d, %d \n", (int)bitmap.height, (int)bitmap.width);
-	printf("%d \n",sizeof(bitmap.content));
-	printf("%d \n",sizeof(pixel));
-	/*if (!pixel)
-  {
-    free(pixel);
-		free(bitmap->content);
-    fclose(filePtr);
-    return NULL;
-  }*/
-
-  fread(pixel, bitmapInfoHeader.biSizeImage, 1, filePtr);
-
-  /*if (pixel == NULL)
-  {
-    fclose(filePtr);
-    return NULL;
-  }*/
-  for (unsigned i = 0; i < bitmapInfoHeader.biSizeImage; i+=3)
+	for (unsigned i = 0; i < 3 * bmp.width * bmp.height; i+=3)
 	{
-		COLOR col = newColor(pixel[i+2], pixel[i+1], pixel[i]);
-		//printf("%d, %d, %d \n", col.r, col.g, col.b);
-		bitmap.content[i/3] = col;
+		color col = newColor(pixel[i+2], pixel[i+1], pixel[i]);
+		bmp.content[i/3] = col;
 	}
-	free(pixel);
-  fclose(filePtr);
-	return bitmap;
+	
+	fclose(fp);	
+	return bmp;
 }
