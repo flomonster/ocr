@@ -47,7 +47,7 @@ void backPropagation(network *n, float *outputs)
 }
 
 // Main function for recognition
-char ocr(BITMAP *img)
+char ocr(bitmap *img)
 {
   // TO DO
   return 'a';
