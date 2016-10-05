@@ -2,8 +2,9 @@
 # include <stdlib.h>
 # include <stdint.h>
 # include "bitmap.h"
+# include <err.h>
 
-
+// Create a new color with RGB as argument 
 color newColor(unsigned char r, unsigned char g, unsigned char b)
 {
   color col;
@@ -13,6 +14,7 @@ color newColor(unsigned char r, unsigned char g, unsigned char b)
   return col;
 }
 
+// Create a new bitmap with width, height and and color array of it
 bitmap newBitmap(unsigned width, unsigned height, color *content)
 {
   bitmap img;
@@ -22,6 +24,11 @@ bitmap newBitmap(unsigned width, unsigned height, color *content)
   return img;
 }
 
+void freeBitmap(bitmap *img)
+{
+  free(img->content);
+}
+
 # pragma pack(push, 1)
 struct s_bitmapFileHeader
 {
@@ -29,7 +36,7 @@ struct s_bitmapFileHeader
 	uint32_t bfSize;  
 	uint16_t bfReserved1;  
 	uint16_t bfReserved2;  
-	uint32_t bfOffBits;  
+	uint32_t bfOffBytes;  
 };
 # pragma pack(pop)
 typedef struct s_bitmapFileHeader bitmapFileHeader;
@@ -44,14 +51,15 @@ struct s_bitmapInfoHeader
 	uint16_t biBitCount;
 	uint32_t biCompression;
 	uint32_t biSizeImage;
-	uint64_t biXPelsPerMeter;
-	uint64_t biYPelsPerMeter;
+	uint32_t biXPelsPerMeter;
+	uint32_t biYPelsPerMeter;
 	uint32_t biClrUsed;
 	uint32_t biClrImportant;
 };
 # pragma pack(pop)
 typedef struct s_bitmapInfoHeader bitmapInfoHeader;
 
+// Print a # for each pixel with R == 0 in a bitmap in argument
 void draw(bitmap *img)
 {
   for (unsigned i = 0; i < img->width * img->height; i++)
@@ -64,7 +72,7 @@ void draw(bitmap *img)
   printf("\n");
 }
 
-/*void binarize(bitmap *img)
+void binarize(bitmap *img)
 {
   // TO DO
 }
@@ -72,8 +80,9 @@ void draw(bitmap *img)
 void resize(bitmap *img)
 {
   // TO DO
-}*/
+}
 
+// Load a bmp file with a path in argument 
 bitmap loadBmp(char *path)
 {
 	FILE *fp = fopen(path, "rb");
@@ -83,19 +92,22 @@ bitmap loadBmp(char *path)
 	
 	fread(&fileHeader, sizeof(bitmapFileHeader), 1, fp);
 	fread(&infoHeader, sizeof(bitmapInfoHeader), 1, fp);
-	fseek(fp, fileHeader.bfOffBits, SEEK_SET);
-
-	bmp.width = infoHeader.biWidth;
+	fseek(fp, fileHeader.bfOffBytes, SEEK_SET);
+	
+  bmp.width = infoHeader.biWidth;
 	bmp.height = infoHeader.biHeight;
 	bmp.content = malloc(sizeof(color) * bmp.width * bmp.height);
-	unsigned char *pixel = malloc(3 * bmp.width * bmp.height);
-	fread(pixel, 3 * bmp.width * bmp.height, 1, fp);
-
-	for (unsigned i = 0; i < 3 * bmp.width * bmp.height; i+=3)
-	{
-		color col = newColor(pixel[i+2], pixel[i+1], pixel[i]);
-		bmp.content[i/3] = col;
-	}
+  
+  color px;
+  for (int i = bmp.height - 1; i >= 0; i--)
+  {
+    for (unsigned j = 0; j < bmp.width; j++)
+    {
+	    fread(&px, 3, 1, fp);
+      bmp.content[i * bmp.width + j] = px;
+    }
+    fseek(fp, 2, SEEK_CUR);
+  } 
 	
 	fclose(fp);	
 	return bmp;

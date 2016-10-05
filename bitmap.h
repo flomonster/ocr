@@ -6,9 +6,9 @@
 #pragma pack(push, 1)
 struct s_color
 {
-  unsigned char r;
-  unsigned char g;
   unsigned char b;
+  unsigned char g;
+  unsigned char r;
 };
 #pragma pack(pop)
 typedef struct s_color color;
@@ -26,6 +26,8 @@ struct s_bitmap
 typedef struct s_bitmap bitmap;
 
 bitmap newBitmap(unsigned, unsigned, color *);
+
+void freeBitmap(bitmap *);
 
 struct s_bitmapFileHeader;
 typedef struct s_bitmapFileHeader bitmapFileHeader;
