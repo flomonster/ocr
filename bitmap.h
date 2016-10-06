@@ -1,28 +1,28 @@
-#ifndef BITMAP_H_DEFINED
-#define BITMAP_H_DEFINED
+# ifndef BITMAP_H_DEFINED
+# define BITMAP_H_DEFINED
 # include <stdio.h>
 # include <stdlib.h>
 
-#pragma pack(push, 1)
+# pragma pack(push, 1)
 struct s_color
 {
   unsigned char b;
   unsigned char g;
   unsigned char r;
 };
-#pragma pack(pop)
+# pragma pack(pop)
 typedef struct s_color color;
 
 color newColor(unsigned char, unsigned char, unsigned char);
 
-#pragma pack(push, 1)
+# pragma pack(push, 1)
 struct s_bitmap
 {
   unsigned width;
   unsigned height;
   color *content;
 };
-#pragma pack(pop)
+# pragma pack(pop)
 typedef struct s_bitmap bitmap;
 
 bitmap newBitmap(unsigned, unsigned, color *);
@@ -42,4 +42,4 @@ void binarize(bitmap *img);
 void resize(bitmap *img);
 
 bitmap loadBmp(char *path);
-#endif
+# endif

@@ -98,6 +98,10 @@ bitmap loadBmp(char *path)
 	bmp.height = infoHeader.biHeight;
 	bmp.content = malloc(sizeof(color) * bmp.width * bmp.height);
   
+  int padding = 4 - (bmp.width * 3) % 4;
+  if (padding == 4)
+    padding = 0;
+
   color px;
   for (int i = bmp.height - 1; i >= 0; i--)
   {
@@ -106,7 +110,7 @@ bitmap loadBmp(char *path)
 	    fread(&px, 3, 1, fp);
       bmp.content[i * bmp.width + j] = px;
     }
-    fseek(fp, 2, SEEK_CUR);
+    fseek(fp, padding, SEEK_CUR);
   } 
 	
 	fclose(fp);	
