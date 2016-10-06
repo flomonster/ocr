@@ -1,13 +1,13 @@
-#ifndef NETWORK_H_INCLUDED
-#define NETWORK_H_INCLUDED
-#include <stdio.h>
-#include <stdlib.h>
+# ifndef NETWORK_H_INCLUDED
+# define NETWORK_H_INCLUDED
+# include <stdio.h>
+# include <stdlib.h>
 
 struct s_network
 {
   unsigned nblayer;
   unsigned *layers;
-  float **treshold;
+  float **threshold;
   float **out;
   float **delta;
   float ***weight;
@@ -23,4 +23,4 @@ network loadNetwork(char *path);
 
 void saveNetwork(char *path, network n);
 
-#endif
+# endif
