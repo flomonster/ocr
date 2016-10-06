@@ -15,7 +15,7 @@ void leaveButton(GtkWidget *pWindow)
 
 void recuperer_chemin(GtkWidget *file_selection)
 {
-    const gchar* chemin;
+    int* chemin;
     GtkWidget *dialog;
     chemin = gtk_file_selection_get_filename(GTK_FILE_SELECTION(file_selection));
 
@@ -32,21 +32,26 @@ void recuperer_chemin(GtkWidget *file_selection)
 
 void creer_file_selection()
 {
-    GtkWidget *selection;
-     
-    selection = gtk_file_selection_new( g_locale_to_utf8
-("Sélectionnez un fichier", -1, NULL, NULL, NULL) );
-    gtk_widget_show(selection);
-     
-    //On interdit l'utilisation des autres fenêtres.
-    gtk_window_set_modal(GTK_WINDOW(selection), TRUE);
-			 
-    g_signal_connect(G_OBJECT(GTK_FILE_SELECTION(selection)->ok_button),
- "clicked", G_CALLBACK(recuperer_chemin), selection);
-     
-    g_signal_connect_swapped(G_OBJECT(
-GTK_FILE_SELECTION(selection)->cancel_button), "clicked", 
-G_CALLBACK(gtk_widget_destroy), selection);
+	GtkWidget *file_selector;
+   /* Create the selector */
+   file_selector = gtk_file_selection_new ("Please select a file for editing.");
+	 GtkWidget *button_ok = (GTK_FILE_SELECTION (file_selector)->ok_button);
+	GtkWidget *button_cancel = (GTK_FILE_SELECTION(file_selector)->cancel_button);
+   g_signal_connect (GTK_BUTTON(button_ok),
+                     "clicked",
+                     G_CALLBACK (recuperer_chemin),
+                     file_selector);
+   /* Ensure that the dialog box is destroyed when the user clicks a button. */
+   g_signal_connect_swapped (GTK_BUTTON(button_ok),
+                             "clicked",
+                             G_CALLBACK (gtk_widget_destroy),
+															 file_selector);
+		 g_signal_connect_swapped(GTK_BUTTON(button_cancel),
+                             "clicked",
+                             G_CALLBACK (gtk_widget_destroy),
+                             file_selector);
+   /* Display that dialog */
+   gtk_widget_show (file_selector);
 }
 
 void quitter(GtkWidget* widget)
