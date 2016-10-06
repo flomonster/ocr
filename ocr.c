@@ -1,8 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include "bitmap.h"
-#include "network.h"
+# include <stdio.h>
+# include <stdlib.h>
+# include <math.h>
+# include "bitmap.h"
+# include "network.h"
 
 // Sigmoid function
 float sigmoid(float x)
@@ -19,7 +19,7 @@ void feedForward(network *n, float *inputs)
   for (unsigned i = 1; i < n->nblayer; i++)
     for (unsigned j = 0; j < n->layers[i]; j++)
     {
-      n->out[i][j] = n->treshold[i-1][j];
+      n->out[i][j] = n->threshold[i-1][j];
       for (unsigned k = 0; k < n->layers[i-1]; k++)
         n->out[i][j] += n->weight[i-1][k][j] * n->out[i-1][k];
       n->out[i][j] = sigmoid(n->out[i][j]);
@@ -36,7 +36,7 @@ void backPropagation(network *n, float *outputs)
     n->delta[last][i] = out * (1 - out) * (out - outputs[i]);
   }
 
-  for (int i = last - 1; i >= 0; i--)
+  for (int i = last - 1; i > 0; i--)
     for (unsigned j = 0; j < n->layers[i]; j++)
     {
       n->delta[i-1][j] = 0;

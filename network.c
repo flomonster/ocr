@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "network.h"
+# include <stdio.h>
+# include <stdlib.h>
+# include "network.h"
 
 // Generate a neural network
-network newNetwork(unsigned  nblayer, unsigned *layers)
+network newNetwork(unsigned nblayer, unsigned *layers)
 {
   network n;
 
@@ -20,7 +20,6 @@ network newNetwork(unsigned  nblayer, unsigned *layers)
   for (unsigned i = 0; i < nblayer; i++)
   {
     float *neurone = (float *) malloc(sizeof(float) * layers[i]);
-    //float neurone[layers[i]];
     for (unsigned j = 0; j < layers[i]; j++)
       neurone[j] = 0;
     o[i] = neurone;
@@ -51,7 +50,7 @@ network newNetwork(unsigned  nblayer, unsigned *layers)
 
   n.nblayer = nblayer;
   n.layers = layers;
-  n.treshold = t;
+  n.threshold = t;
   n.out = o;
   n.delta = d;
   n.weight = w;
@@ -62,8 +61,8 @@ network newNetwork(unsigned  nblayer, unsigned *layers)
 void freeNetwork(network *n)
 {
   for (unsigned i = 0; i < n->nblayer - 1; i++)
-    free(n->treshold[i]);
-  free(n->treshold);
+    free(n->threshold[i]);
+  free(n->threshold);
   for (unsigned i = 0; i < n->nblayer; i++)
     free(n->out[i]);
   free(n->out);

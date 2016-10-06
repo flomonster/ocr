@@ -1,7 +1,7 @@
-#ifndef OCR_H_INCLUDED
-#define OCR_H_INCLUDED
-#include "bitmap.h"
-#include "network.h"
+# ifndef OCR_H_INCLUDED
+# define OCR_H_INCLUDED
+# include "bitmap.h"
+# include "network.h"
 
 float sigmoid(float);
 
@@ -11,4 +11,4 @@ void backPropagation(network *, float *);
 
 char ocr(bitmap *);
 
-#endif
+# endif
