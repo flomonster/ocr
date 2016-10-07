@@ -1,8 +1,8 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <stdint.h>
-# include "bitmap.h"
 # include <err.h>
+# include "bitmap.h"
 
 // Create a new color with RGB as argument 
 color newColor(unsigned char r, unsigned char g, unsigned char b)
@@ -74,12 +74,61 @@ void draw(bitmap *img)
 
 void binarize(bitmap *img)
 {
-  // TO DO
+  unsigned short c = 0;
+  for (unsigned i = 0; i < img->width * img->height; i++)
+  {
+    c = img->content[i].r;
+    c += img->content[i].g;
+    c += img->content[i].b;
+
+    c = c > 384 ? 255 : 0;
+    img->content[i].r = c;
+    img->content[i].g = c;
+    img->content[i].b = c;
+  }
 }
 
 void resize(bitmap *img)
 {
-  // TO DO
+  unsigned newWidth = 16;
+  unsigned newHeight = 16;
+  unsigned pos;
+  unsigned pos2;
+  float rWidth = (float) img->width / newWidth;
+  float rHeight = (float) img->height / newHeight; 
+  unsigned count;
+  unsigned short sumR, sumG, sumB;
+
+  color *cont = malloc(sizeof(color) * newWidth * newHeight);
+
+  for (unsigned y = 0; y < newHeight; y++)
+  {
+    for (unsigned x = 0; x < newWidth; x++)
+    {
+      sumR = 0;
+      sumG = 0;
+      sumB = 0;
+      count = 0;
+      for (unsigned i = x * rWidth; i < x * rWidth + rWidth; i++)
+        for (unsigned j = y * rHeight; j < y * rHeight + rHeight; j++)
+        {
+             pos = i + j * img->width;
+             sumR += img->content[pos].r;
+             sumG += img->content[pos].g;
+             sumB += img->content[pos].b;
+             count++;
+        }
+
+      pos2 = x + y * newWidth;
+      cont[pos2].r = sumR / count;
+      cont[pos2].g = sumG / count;
+      cont[pos2].b = sumB / count;
+    }
+  }
+  free(img->content);
+  img->content = cont;
+  img->width = newWidth;
+  img->height = newHeight;
 }
 
 // Load a bmp file with a path in argument 
