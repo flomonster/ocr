@@ -9,6 +9,8 @@ void feedForward(network *, float *);
 
 void backPropagation(network *, float *);
 
+void update(network *, float *);
+
 char ocr(bitmap *);
 
 # endif
