@@ -77,10 +77,7 @@ void binarize(bitmap *img)
   unsigned short c = 0;
   for (unsigned i = 0; i < img->width * img->height; i++)
   {
-    c = img->content[i].r;
-    c += img->content[i].g;
-    c += img->content[i].b;
-
+    c = img->content[i].r + img->content[i].g + img->content[i].b;
     c = c > 384 ? 255 : 0;
     img->content[i].r = c;
     img->content[i].g = c;
@@ -92,13 +89,11 @@ void resize(bitmap *img)
 {
   unsigned newWidth = 16;
   unsigned newHeight = 16;
-  unsigned pos;
-  unsigned pos2;
-  float rWidth = (float) img->width / newWidth;
-  float rHeight = (float) img->height / newHeight; 
+  unsigned pos, pos2;
   unsigned count;
   unsigned short sumR, sumG, sumB;
-
+  float rWidth = (float) img->width / newWidth;
+  float rHeight = (float) img->height / newHeight;
   color *cont = malloc(sizeof(color) * newWidth * newHeight);
 
   for (unsigned y = 0; y < newHeight; y++)
