@@ -47,7 +47,7 @@ void backPropagation(network *n, float *outputs)
 }
 
 // Update weight and threshold
-void update(network *n, unsigned float speed)
+void update(network *n, float speed)
 {
   for (unsigned i = 0; i < n->nblayer - 1; i++)
   {
@@ -61,16 +61,32 @@ void update(network *n, unsigned float speed)
 }
 
 // Ealuates a neural network
-float evaluate(network *n, float **samples, float *result, unsigned nbSample)
+float evaluate(network *n, float **samples, float **result, unsigned nbSample)
 {
   float error = 0;
   for (unsigned i = 0; i < nbSample; i++)
   {
     feedForward(n, samples[i]);
-    for (unsigned j = 0; j < nbSample; j++)
-      error += abs(n->out[n->nblayer - 1][j] - result[j]);
+    for (unsigned j = 0; j < n->layers[n->nblayer - 1]; j++)
+      error += abs(n->out[n->nblayer - 1][i] - result[i][j]);
   }
   return error;
+}
+
+// Learning
+void learn(network *n, float **samples, float **result, unsigned nbSample,
+    float speed, float goal)
+{
+  while (evaluate(n, samples, result, nbSample) > goal)
+  {
+    for (int j = 0; j < nbSample; j++)
+    {
+      feedForward(n, samples[j]);
+      backPropagation(n, result[j]);
+      update(n, speed);
+    }
+    printf("Actual error : %d", evaluate(n, samples, result, nbSample)); 
+  }
 }
 
 // Main function for recognition

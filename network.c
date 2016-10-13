@@ -3,9 +3,9 @@
 # include "network.h"
 
 // Generate a neural network
-network newNetwork(unsigned nblayer, unsigned *layers)
+network *newNetwork(unsigned nblayer, unsigned *layers)
 {
-  network n;
+  network *n = (network *) malloc(sizeof(network));
 
   float **t = (float **) malloc(sizeof(float *) * (nblayer - 1));
   for (unsigned i = 1; i < nblayer; i++)
@@ -48,12 +48,12 @@ network newNetwork(unsigned nblayer, unsigned *layers)
     w[i] = origin;
   }
 
-  n.nblayer = nblayer;
-  n.layers = layers;
-  n.threshold = t;
-  n.out = o;
-  n.delta = d;
-  n.weight = w;
+  n->nblayer = nblayer;
+  n->layers = layers;
+  n->threshold = t;
+  n->out = o;
+  n->delta = d;
+  n->weight = w;
   return n;
 } 
 
@@ -76,6 +76,7 @@ void freeNetwork(network *n)
     free(n->weight[i]);
   }
   free(n->weight);
+  free(n);
 }
 
 network loadNetwork(char *path)

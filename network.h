@@ -15,7 +15,7 @@ struct s_network
 
 typedef struct s_network network;
 
-network newNetwork(unsigned  nblayer, unsigned *layers);
+network *newNetwork(unsigned  nblayer, unsigned *layers);
 
 void freeNetwork(network *n);
 
