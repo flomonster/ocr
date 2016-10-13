@@ -13,4 +13,6 @@ void update(network *, float *);
 
 char ocr(bitmap *);
 
+void learn(network*, float**, float**, unsigned, float, float);
+
 # endif
