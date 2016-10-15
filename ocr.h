@@ -9,10 +9,12 @@ void feedForward(network *, float *);
 
 void backPropagation(network *, float *);
 
-void update(network *, float *);
+void update(network *, float);
+
+float evaluate(network *, float **, float **, unsigned);
 
 char ocr(bitmap *);
 
-void learn(network*, float**, float**, unsigned, float, float);
+void learn(network *, float **, float **, unsigned, float, float);
 
 # endif
