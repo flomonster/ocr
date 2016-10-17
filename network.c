@@ -79,6 +79,7 @@ void freeNetwork(network *n)
   free(n);
 }
 
+/*
 network loadNetwork(char *path)
 {
   // TO DO
@@ -90,3 +91,4 @@ void saveNetwork(char *path, network n)
 {
   // TO DO
 }
+*/
