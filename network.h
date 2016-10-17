@@ -19,8 +19,8 @@ network *newNetwork(unsigned  nblayer, unsigned *layers);
 
 void freeNetwork(network *n);
 
-network loadNetwork(char *path);
+//network loadNetwork(char *path);
 
-void saveNetwork(char *path, network n);
+//void saveNetwork(char *path, network n);
 
 # endif

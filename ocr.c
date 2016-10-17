@@ -90,9 +90,11 @@ void learn(network *n, float **samples, float **results, unsigned nbSample,
   }
 }
 
+/*
 // Main function for recognition
 char ocr(bitmap *img)
 {
   // TO DO
   return 'a';
 }
+*/

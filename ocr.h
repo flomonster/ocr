@@ -13,8 +13,8 @@ void update(network *, float);
 
 float evaluate(network *, float **, float **, unsigned);
 
-char ocr(bitmap *);
-
 void learn(network *, float **, float **, unsigned, float, float);
+
+//char ocr(bitmap *);
 
 # endif
