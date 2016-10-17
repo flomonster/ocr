@@ -70,10 +70,7 @@ float evaluate(network *n, float **samples, float **results, unsigned nbSample)
   {
     feedForward(n, samples[i]);
     for (unsigned j = 0; j < n->layers[last]; j++)
-    {
-      warnx("%.6f", fabsf(n->out[last][j] - results[i][j]));
       error += fabsf(n->out[last][j] - results[i][j]);
-    }
   }
   return error;
 }
@@ -84,16 +81,13 @@ void learn(network *n, float **samples, float **results, unsigned nbSample,
 {
   while (evaluate(n, samples, results, nbSample) > goal)
   {
-    warnx("--------");
     for (unsigned j = 0; j < nbSample; j++)
     {
       feedForward(n, samples[j]);
       backPropagation(n, results[j]);
       update(n, speed);
     }
-    goal += .02;
   }
-  //warnx("Actual error : %.6f", evaluate(n, samples, results, nbSample)); 
 }
 
 // Main function for recognition
