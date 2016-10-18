@@ -1,4 +1,4 @@
-int start(int argc, char **argv, char *filename);
+int start(int argc, char **argv);
 
 void leaveButton(GtkWidget *pWindow);
 
