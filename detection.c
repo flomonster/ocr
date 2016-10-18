@@ -84,13 +84,36 @@ void cutCollumn(bitmap *img, char *array, queuE *q)
         j++;
       color *content = malloc(sizeof(color) * img->height * j);
       
-      for(unsigned k = 0; k < j; k++)
-        for(unsigned l = 0; l < img->height; l++)
-        {
+      for (unsigned k = 0; k < j; k++)
+        for (unsigned l = 0; l < img->height; l++)
           content[l * j + k] = img->content[l * img->width + i + k];
-        }
       i += j;
       bitmap bmp = newBitmap(j, img->height, content);
+      enQueuE(q, bmp);
+    }
+  }
+}
+
+void cutLine(bitmap *img, char *array, queuE *q)
+{
+  // i -> parcour toute l'image de haut en bas
+  // j -> permet de connaitre la hauteur de l'image
+  // k -> parcour la new image de haut en bas
+  // l -> parcour l'image de gauche a droite
+  for (unsigned i = 0; i < img->height; i++)
+  {
+    if (array[i] == 1)
+    {
+      unsigned j = 0; 
+      while (array[j + i] == 1)
+        j++;
+      color *content = malloc(sizeof(color) * img->width * j);
+      
+      for (unsigned k = 0; k < j; k++)
+        for (unsigned l = 0; l < img->width; l++)
+          content[k * img->width + l] = img->content[(k + i) * img->width + l];
+      i += j;
+      bitmap bmp = newBitmap(img->width, j, content);
       enQueuE(q, bmp);
     }
   }
