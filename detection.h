@@ -4,20 +4,33 @@
 # include <stdlib.h>
 # include "bitmap.h"
 
-struct s_element;
+
 typedef struct s_element element;
+struct s_element
+{
+  bitmap img; 
+  element *next;
+};
 
-struct s_queu;
-typedef struct s_queu queu;
+struct s_queuE
+{
+  int length; 
+  element *first;
+  element *last;
+};
+typedef struct s_queuE queuE;
 
-struct s_queuOfQueu;
-typedef struct s_queuOfQueu queuOfQueu;
+queuE *newQueuE();
 
-queu newQueu();
+void enQueuE(queuE *, bitmap);
 
-void enQueu(queu *, bitmap);
+element deQueuE(queuE *);
 
-element deQueu(queu *);
+void putLineMarker(bitmap *, char *);
+
+void putCollumnMarker(bitmap *, char *);
+
+void cutCollumn(bitmap *, char *, queuE *);
 
 # endif
 
