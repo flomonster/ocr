@@ -32,5 +32,7 @@ void putCollumnMarker(bitmap *, char *);
 
 void cutCollumn(bitmap *, char *, queuE *);
 
+void cutLine(bitmap *, char *, queuE *);
+
 # endif
 
