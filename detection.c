@@ -79,10 +79,16 @@ bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
 
 queue *segmentation(bitmap *img)
 {
+  color content[img->height * img->width];
+  for (unsigned c = 0; c < img->height * img->width; c++)
+    content[c] = img->content[c];
+  bitmap *bmp = newBitmap(img->width, img->height, content);
+  binarize(bmp);
+
   queue *q = newQueue();
   char lineMarker[img->height];
   char collumnMarker[img->width]; 
-  putLineMarker(img, lineMarker);
+  putLineMarker(bmp, lineMarker);
   unsigned Y, X;
 
   unsigned i = 0; 
@@ -95,18 +101,18 @@ queue *segmentation(bitmap *img)
         i++;
       
       queue *line = newQueue();
-      putCollumnMarker(img, Y, i, collumnMarker);
+      putCollumnMarker(bmp, Y, i, collumnMarker);
 
       unsigned j = 0;
-      while (j  < img->width)
+      while (j < img->width)
       {
         if (collumnMarker[j] == 1)
         {
           X = j;
           while (collumnMarker[j] == 1)
             j++;
-          bitmap *bmp = cutBmp(img, X, Y, j - X, i - Y);
-          enQueue(line, bmp);
+          bitmap *bmpResult = cutBmp(img, X, Y, j - X, i - Y);
+          enQueue(line, bmpResult);
         }
         j++;
       }
