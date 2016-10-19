@@ -1,5 +1,6 @@
 # include <stdio.h>
 # include <stdlib.h>
+# include <err.h>
 # include "network.h"
 
 // Generate a neural network
@@ -76,89 +77,65 @@ void freeNetwork(network *n)
     free(n->weight[i]);
   }
   free(n->weight);
+  free(n->layers);
   free(n);
 }
 
 
-network *loadNetwork(char *path);
-/*{
+network *loadNetwork(char *path)
+{
   
   FILE *file = fopen(path, "r");
-  unsigned nblayer;
-  
-  
-  
   
   //nblayer
-  fgets(
-  network n;
+  unsigned nblayer;  
+  fread(&nblayer, sizeof(unsigned), 1, file);
+
+  //*layers
+  unsigned *layers = malloc(nblayer * sizeof(unsigned));
+  fread(layers, sizeof(unsigned), nblayer, file);
+
+  network *n = newNetwork(nblayer, layers);
+
+  //**threshold
+  for(unsigned k = 0; k < n->nblayer - 1; k++)
+    fread(n->threshold[k], sizeof(float), n->layers[k + 1], file);
+  
+  //***weight
+  for(unsigned k = 0; k < n->nblayer - 1; k++)
+    for(unsigned l = 0; l < n->layers[k]; l++)
+      fread(n->weight[k][l], sizeof(float), n->layers[k + 1], file);
+
+  fclose(file);
+
   return n;
   
 }
-*/
+
 // Save the network in a file
 void saveNetwork(char *path, network *n)
 {
   FILE *file = fopen(path, "w");
   if (file == NULL)
-    errx("error during fopen");
+    errx(1, "error during fopen");
   
-  char s[5];
   //nblayer
-  sprintf(s, "%d", n->nblayer); 
-  fputs(s, file);
-  fputc('\n', file);
+  fwrite(&n->nblayer, sizeof(unsigned), 1, file);
+  //fputc('\n', file);
   
   //*layers
-  unsigned k = 0;
-  unsigned l,m;
-  while(k < n->nblayer - 1)
-  {
-    sprintf(s, "%d", n->layers[k]);
-    fputs(s, file);
-    fputc(' ', file);
-    k++;
-  }
-  sprintf(s, "%d", n->layers[k]);
-  fputs(s, file);
-  fputc('\n', file);
+  fwrite(n->layers, sizeof(unsigned), n->nblayer, file);
   
   //**threshold
-  for(k = 1; k < n->nblayer; k++)
-  {
-    l = 0;
-    while(l < n->layers[k] - 1)
-    {
-      sprintf(s, "%f", n->threshold[k - 1][l]);
-      fputs(s, file);
-      fputc(' ', file);
-      l++;
-    }
-    sprintf(s, "%f", n->threshold[k - 1][l]);
-    fputs(s, file);
-    fputc('\n', file);
-  }
+  for(unsigned k = 1; k < n->nblayer; k++)
+    fwrite(n->threshold[k - 1], sizeof(float), n->layers[k], file);
 
   //***weight
-  for(k = 0; k < n->nblayer - 1; k++)
-  {
-    for(l = 0; l < n->layers[k]; l++)
-    {
-      m = 0;
-      while(m < n->layers[k + 1] - 1)
-      {
-        sprintf(s, "%f", n->weight[k][l][m]);
-        fputs(s, file);
-        fputc(' ', file);
-        m++;
-      }
-      sprintf(s, "%f", n->weight[k][l][m]);
-      fputs(s, file);
-      fputc('\n', file);
-    }
-  }
+  for(unsigned k = 0; k < n->nblayer - 1; k++)
+    for(unsigned l = 0; l < n->layers[k]; l++)
+      fwrite(n->weight[k][l], sizeof(float), n->layers[k + 1], file);
   
-
+  fclose(file);
 }
 
 
