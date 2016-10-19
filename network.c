@@ -79,16 +79,89 @@ void freeNetwork(network *n)
   free(n);
 }
 
-/*
-network loadNetwork(char *path)
-{
-  // TO DO
+
+network *loadNetwork(char *path);
+/*{
+  
+  FILE *file = fopen(path, "r");
+  unsigned nblayer;
+  
+  
+  
+  
+  //nblayer
+  fgets(
   network n;
   return n;
-}
-
-void saveNetwork(char *path, network n)
-{
-  // TO DO
+  
 }
 */
+// Save the network in a file
+void saveNetwork(char *path, network *n)
+{
+  FILE *file = fopen(path, "w");
+  if (file == NULL)
+    errx("error during fopen");
+  
+  char s[5];
+  //nblayer
+  sprintf(s, "%d", n->nblayer); 
+  fputs(s, file);
+  fputc('\n', file);
+  
+  //*layers
+  unsigned k = 0;
+  unsigned l,m;
+  while(k < n->nblayer - 1)
+  {
+    sprintf(s, "%d", n->layers[k]);
+    fputs(s, file);
+    fputc(' ', file);
+    k++;
+  }
+  sprintf(s, "%d", n->layers[k]);
+  fputs(s, file);
+  fputc('\n', file);
+  
+  //**threshold
+  for(k = 1; k < n->nblayer; k++)
+  {
+    l = 0;
+    while(l < n->layers[k] - 1)
+    {
+      sprintf(s, "%f", n->threshold[k - 1][l]);
+      fputs(s, file);
+      fputc(' ', file);
+      l++;
+    }
+    sprintf(s, "%f", n->threshold[k - 1][l]);
+    fputs(s, file);
+    fputc('\n', file);
+  }
+
+  //***weight
+  for(k = 0; k < n->nblayer - 1; k++)
+  {
+    for(l = 0; l < n->layers[k]; l++)
+    {
+      m = 0;
+      while(m < n->layers[k + 1] - 1)
+      {
+        sprintf(s, "%f", n->weight[k][l][m]);
+        fputs(s, file);
+        fputc(' ', file);
+        m++;
+      }
+      sprintf(s, "%f", n->weight[k][l][m]);
+      fputs(s, file);
+      fputc('\n', file);
+    }
+  }
+  
+
+}
+
+
+
+
+
