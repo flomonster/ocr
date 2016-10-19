@@ -4,45 +4,39 @@
 # include "bitmap.h"
 # include "detection.h"
 
-queuE *newQueuE()
+queue *newQueue()
 {
-  queuE *q =  malloc(sizeof(queuE));
+  queue *q =  malloc(sizeof(queue));
   q->length = 0;
-  q->first = NULL;
-  q->last = NULL;
   return q;
 }
 
-void enQueuE(queuE *q, bitmap img)
+void enQueue(queue *q, void *obj)
 {
-  element *el = malloc(sizeof(element));
-  el->img = img;
-  el->next = NULL;
+  element *elt = malloc(sizeof(element));
+  elt->obj = obj;
 
   if (q->length == 0)
-    q->first = el;
+    q->first = elt;
   else 
-  {
-    element *bLast = q->last;
-    bLast->next = el;
-  }
-  q->last = el;
+    q->last->next = elt;
+  q->last = elt;
   q->length++;
 }
 
-element deQueuE(queuE *q)
+void *deQueue(queue *q)
 {
   if (q->length > 0)
   {
-    element *save = q->first->next;
-    element el = *q->first;
-    free(q->first);
-    q->first = save;
+    void *obj = q->first->obj;
+    element *save = q->first;
+    q->first = q->first->next;
+    free(save);
     q->length--;
-    return el;
+    return obj;
   }
   else 
-    exit(EXIT_FAILURE);
+    errx(1, "Can not dequeue : length = 0 !");
 }
 
 void putLineMarker(bitmap *img, char *array)
@@ -50,72 +44,75 @@ void putLineMarker(bitmap *img, char *array)
   for(unsigned i = 0; i < img->height; i++)
   {
     unsigned j = 1; 
-    while (j < img->width - 1 && 
-        img->content[i * img->width].r == img->content[i * img->width + j].r)
+    unsigned char mem = img->content[i * img->width].r;
+    while (j < img->width && mem == img->content[i * img->width + j].r)
       j++;
-    array[i] = j == img->width - 1 ? 0 : 1;
+    array[i] = j == img->width ? 0 : 1;
   }
 }
 
-void putCollumnMarker(bitmap *img, char *array)
+void putCollumnMarker(bitmap *img, unsigned min, unsigned max, char *array)
 {
   for(unsigned i = 0; i < img->width; i++)
   {
-    unsigned j = 1; 
-    while (j < img->height - 1 && 
+    unsigned j = min; 
+    while (j < max &&
         img->content[i].r == img->content[j * img->width + i].r)
       j++;
-    array[i] = j == img->height - 1 ? 0 : 1;
+    array[i] = j == max ? 0 : 1;
   }
 }
 
-void cutCollumn(bitmap *img, char *array, queuE *q)
+bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
+    unsigned width, unsigned height)
 {
-  // i -> parcour toute l'image de gauche a droite
-  // j -> permet de connaitre la largeur de la lettre 
-  // k -> parcour la new image de gauche a droite 
-  // l -> parcour la new image de haut en bas
-  for(unsigned i = 0; i < img->width; i++)
+  
+  color *content = malloc(sizeof(color) * height * width);
+  for (unsigned i = 0; i < height; i++)
   {
-    if (array[i] == 1)
-    {
-      unsigned j = 0; 
-      while (array[j + i] == 1)
-        j++;
-      color *content = malloc(sizeof(color) * img->height * j);
-      
-      for (unsigned k = 0; k < j; k++)
-        for (unsigned l = 0; l < img->height; l++)
-          content[l * j + k] = img->content[l * img->width + i + k];
-      i += j;
-      bitmap bmp = newBitmap(j, img->height, content);
-      enQueuE(q, bmp);
-    }
+    for (unsigned j = 0; j < width; j++)
+      content[i * width + j] = img->content[(i + Y) * img->width + j + X];
   }
+  bitmap *bmp = newBitmap(width, height, content);
+  return bmp;
 }
 
-void cutLine(bitmap *img, char *array, queuE *q)
+queue *segmentation(bitmap *img)
 {
-  // i -> parcour toute l'image de haut en bas
-  // j -> permet de connaitre la hauteur de l'image
-  // k -> parcour la new image de haut en bas
-  // l -> parcour l'image de gauche a droite
-  for (unsigned i = 0; i < img->height; i++)
-  {
-    if (array[i] == 1)
-    {
-      unsigned j = 0; 
-      while (array[j + i] == 1)
-        j++;
-      color *content = malloc(sizeof(color) * img->width * j);
-      
-      for (unsigned k = 0; k < j; k++)
-        for (unsigned l = 0; l < img->width; l++)
-          content[k * img->width + l] = img->content[(k + i) * img->width + l];
-      i += j;
-      bitmap bmp = newBitmap(img->width, j, content);
-      enQueuE(q, bmp);
-    }
-  }
-}
+  queue *q = newQueue();
+  char lineMarker[img->height];
+  char collumnMarker[img->width]; 
+  putLineMarker(img, lineMarker);
+  unsigned Y, X;
 
+  unsigned i = 0; 
+  while (i < img->height)
+  {
+    if (lineMarker[i] == 1)
+    {
+      Y = i;
+      while (i < img->height && lineMarker[i] == 1)
+        i++;
+      
+      queue *line = newQueue();
+      putCollumnMarker(img, Y, i, collumnMarker);
+
+      unsigned j = 0;
+      while (j  < img->width)
+      {
+        if (collumnMarker[j] == 1)
+        {
+          X = j;
+          while (collumnMarker[j] == 1)
+            j++;
+          bitmap *bmp = cutBmp(img, X, Y, j - X, i - Y);
+          enQueue(line, bmp);
+        }
+        j++;
+      }
+      enQueue(q, line);
+    }
+    i++;
+  }
+  return q;
+}

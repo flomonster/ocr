@@ -4,31 +4,6 @@
 # include <err.h>
 # include "bitmap.h"
 
-// Create a new color with RGB as argument 
-color newColor(unsigned char r, unsigned char g, unsigned char b)
-{
-  color col;
-  col.r = r;
-  col.g = g;
-  col.b = b;
-  return col;
-}
-
-// Create a new bitmap with width, height and and color array of it
-bitmap newBitmap(unsigned width, unsigned height, color *content)
-{
-  bitmap img;
-  img.width = width;
-  img.height = height;
-  img.content = content;
-  return img;
-}
-
-void freeBitmap(bitmap *img)
-{
-  free(img->content);
-}
-
 # pragma pack(push, 1)
 struct s_bitmapFileHeader
 {
@@ -58,6 +33,32 @@ struct s_bitmapInfoHeader
 };
 # pragma pack(pop)
 typedef struct s_bitmapInfoHeader bitmapInfoHeader;
+
+// Create a new color with RGB as argument 
+color newColor(unsigned char r, unsigned char g, unsigned char b)
+{
+  color col;
+  col.r = r;
+  col.g = g;
+  col.b = b;
+  return col;
+}
+
+// Create a new bitmap with width, height and and color array of it
+bitmap *newBitmap(unsigned width, unsigned height, color *content)
+{
+  bitmap *img = malloc(sizeof(bitmap));
+  img->width = width;
+  img->height = height;
+  img->content = content;
+  return img;
+}
+
+void freeBitmap(bitmap *img)
+{
+  free(img->content);
+  free(img);
+}
 
 // Print a # for each pixel with R == 0 in a bitmap in argument
 void draw(bitmap *img)
@@ -107,13 +108,12 @@ void resize(bitmap *img)
       for (unsigned i = x * rWidth; i < x * rWidth + rWidth; i++)
         for (unsigned j = y * rHeight; j < y * rHeight + rHeight; j++)
         {
-             pos = i + j * img->width;
-             sumR += img->content[pos].r;
-             sumG += img->content[pos].g;
-             sumB += img->content[pos].b;
-             count++;
+          pos = i + j * img->width;
+          sumR += img->content[pos].r;
+          sumG += img->content[pos].g;
+          sumB += img->content[pos].b;
+          count++;
         }
-
       pos2 = x + y * newWidth;
       cont[pos2].r = sumR / count;
       cont[pos2].g = sumG / count;
@@ -127,32 +127,32 @@ void resize(bitmap *img)
 }
 
 // Load a bmp file with a path in argument 
-bitmap loadBmp(char *path)
+bitmap *loadBmp(char *path)
 {
 	FILE *fp = fopen(path, "rb");
 	bitmapFileHeader fileHeader;
 	bitmapInfoHeader infoHeader;
-	bitmap bmp;
+	bitmap *bmp = malloc(sizeof(bitmap));
 	
 	fread(&fileHeader, sizeof(bitmapFileHeader), 1, fp);
 	fread(&infoHeader, sizeof(bitmapInfoHeader), 1, fp);
 	fseek(fp, fileHeader.bfOffBytes, SEEK_SET);
 	
-  bmp.width = infoHeader.biWidth;
-	bmp.height = infoHeader.biHeight;
-	bmp.content = malloc(sizeof(color) * bmp.width * bmp.height);
+  bmp->width = infoHeader.biWidth;
+	bmp->height = infoHeader.biHeight;
+	bmp->content = malloc(sizeof(color) * bmp->width * bmp->height);
   
-  int padding = 4 - (bmp.width * 3) % 4;
+  int padding = 4 - (bmp->width * 3) % 4;
   if (padding == 4)
     padding = 0;
 
   color px;
-  for (int i = bmp.height - 1; i >= 0; i--)
+  for (int i = bmp->height - 1; i >= 0; i--)
   {
-    for (unsigned j = 0; j < bmp.width; j++)
+    for (unsigned j = 0; j < bmp->width; j++)
     {
 	    fread(&px, 3, 1, fp);
-      bmp.content[i * bmp.width + j] = px;
+      bmp->content[i * bmp->width + j] = px;
     }
     fseek(fp, padding, SEEK_CUR);
   } 

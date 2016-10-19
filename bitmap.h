@@ -25,7 +25,7 @@ struct s_bitmap
 # pragma pack(pop)
 typedef struct s_bitmap bitmap;
 
-bitmap newBitmap(unsigned, unsigned, color *);
+bitmap *newBitmap(unsigned, unsigned, color *);
 
 void freeBitmap(bitmap *);
 
@@ -41,5 +41,6 @@ void binarize(bitmap *img);
 
 void resize(bitmap *img);
 
-bitmap loadBmp(char *path);
+bitmap *loadBmp(char *path);
+
 # endif
