@@ -4,6 +4,7 @@
 # include "bitmap.h"
 # include "detection.h"
 
+// Create new queue
 queue *newQueue()
 {
   queue *q =  malloc(sizeof(queue));
@@ -11,6 +12,7 @@ queue *newQueue()
   return q;
 }
 
+// Append element to a queue
 void enQueue(queue *q, void *obj)
 {
   element *elt = malloc(sizeof(element));
@@ -24,6 +26,7 @@ void enQueue(queue *q, void *obj)
   q->length++;
 }
 
+// Remove and give you the first element of a queue
 void *deQueue(queue *q)
 {
   if (q->length > 0)
@@ -39,6 +42,7 @@ void *deQueue(queue *q)
     errx(1, "Can not dequeue : length = 0 !");
 }
 
+// Put a marker for each line with a letter
 void putLineMarker(bitmap *img, char *array)
 {
   for(unsigned i = 0; i < img->height; i++)
@@ -51,7 +55,8 @@ void putLineMarker(bitmap *img, char *array)
   }
 }
 
-void putCollumnMarker(bitmap *img, unsigned min, unsigned max, char *array)
+// Put a marker for each column with a letter
+void putColumnMarker(bitmap *img, unsigned min, unsigned max, char *array)
 {
   for(unsigned i = 0; i < img->width; i++)
   {
@@ -63,6 +68,7 @@ void putCollumnMarker(bitmap *img, unsigned min, unsigned max, char *array)
   }
 }
 
+// Create a bitmap from an other 
 bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
     unsigned width, unsigned height)
 {
@@ -77,6 +83,7 @@ bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
   return bmp;
 }
 
+// Create a queue with all letter in a bitmap
 queue *segmentation(bitmap *img)
 {
   color content[img->height * img->width];
@@ -87,7 +94,7 @@ queue *segmentation(bitmap *img)
 
   queue *q = newQueue();
   char lineMarker[img->height];
-  char collumnMarker[img->width]; 
+  char columnMarker[img->width]; 
   putLineMarker(bmp, lineMarker);
   unsigned Y, X;
 
@@ -101,15 +108,15 @@ queue *segmentation(bitmap *img)
         i++;
       
       queue *line = newQueue();
-      putCollumnMarker(bmp, Y, i, collumnMarker);
+      putColumnMarker(bmp, Y, i, columnMarker);
 
       unsigned j = 0;
       while (j < img->width)
       {
-        if (collumnMarker[j] == 1)
+        if (columnMarker[j] == 1)
         {
           X = j;
-          while (collumnMarker[j] == 1)
+          while (columnMarker[j] == 1)
             j++;
           bitmap *bmpResult = cutBmp(img, X, Y, j - X, i - Y);
           enQueue(line, bmpResult);
@@ -120,5 +127,6 @@ queue *segmentation(bitmap *img)
     }
     i++;
   }
+  free(bmp);
   return q;
 }

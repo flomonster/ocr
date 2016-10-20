@@ -27,7 +27,7 @@ void *deQueue(queue *);
 
 void putLineMarker(bitmap *, char *);
 
-void putCollumnMarker(bitmap *, unsigned, unsigned, char *);
+void putColumnMarker(bitmap *, unsigned, unsigned, char *);
 
 bitmap *cutBmp(bitmap *, unsigned, unsigned, unsigned, unsigned);
 
