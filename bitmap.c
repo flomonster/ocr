@@ -63,14 +63,21 @@ void freeBitmap(bitmap *img)
 // Print a # for each pixel with R == 0 in a bitmap in argument
 void draw(bitmap *img)
 {
+  printf("+");
+  for (unsigned i = 0; i < img->width + 2; i++)
+    printf("-");
+  printf("+\n| ");
   for (unsigned i = 0; i < img->width * img->height; i++)
   {
 		if (i % img->width == 0 && i != 0)
-      printf("\n");
+      printf(" |\n| ");
     char c = img->content[i].r == 0 ? '#' : ' ';
     printf("%c", c); 
   }
-  printf("\n");
+  printf(" |\n+");
+  for (unsigned i = 0; i < img->width + 2; i++)
+    printf("-");
+  printf("+\n");
 }
 
 void binarize(bitmap *img)
