@@ -81,7 +81,7 @@ void freeNetwork(network *n)
   free(n);
 }
 
-
+// Load the network from a file
 network *loadNetwork(char *path)
 {
   
@@ -109,7 +109,6 @@ network *loadNetwork(char *path)
   fclose(file);
 
   return n;
-  
 }
 
 // Save the network in a file
@@ -137,8 +136,3 @@ void saveNetwork(char *path, network *n)
   
   fclose(file);
 }
-
-
-
-
-
