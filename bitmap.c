@@ -142,6 +142,12 @@ bitmap *loadBmp(char *path)
 	bitmap *bmp = malloc(sizeof(bitmap));
 	
 	fread(&fileHeader, sizeof(bitmapFileHeader), 1, fp);
+
+  if (fileHeader.bfType != 0x4D42)
+  {
+    fclose(fp);
+    errx(1, "The expected file is not a .bmp");
+  }
 	fread(&infoHeader, sizeof(bitmapInfoHeader), 1, fp);
 	fseek(fp, fileHeader.bfOffBytes, SEEK_SET);
 	
