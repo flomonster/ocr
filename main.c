@@ -1,6 +1,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <err.h>
+# include <time.h>
 # include "ocr.h"
 # include "detection.h"
 
@@ -84,9 +85,15 @@ int main(int argc, char *argv[])
     int *nbSample = malloc(sizeof(int));
     float **inputs = createSamples(argv[2], nbSample);
     float **outputs = createResults(argv[3], *nbSample);
-
+    clock_t chrono = clock();
     learn(n, inputs, outputs, *nbSample, .5, .1);
+    printf("LEARNING :\n");
+    printf("  - Time : %.6f (seconds)\n", (clock() - chrono) / 1000000.0F);
+    
+    printf("  - Creation of network.save\n");
     saveNetwork("network.save", n);
+
+    printf("  - DONE\n");
 
     freeSamples(inputs, *nbSample);
     freeSamples(outputs, *nbSample);

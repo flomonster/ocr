@@ -79,7 +79,7 @@ float evaluate(network *n, float **samples, float **results, unsigned nbSample)
 void learn(network *n, float **samples, float **results, unsigned nbSample,
     float speed, float goal)
 {
-  float iter = 0;
+  int iter = 0;
   while (iter < 500 || evaluate(n, samples, results, nbSample) > goal)
   {
     for (unsigned j = 0; j < nbSample; j++)
@@ -88,7 +88,7 @@ void learn(network *n, float **samples, float **results, unsigned nbSample,
       backPropagation(n, results[j]);
       update(n, speed);
     }
-    iter++;
+    iter = (iter + 1) % 501;
   }
 }
 
