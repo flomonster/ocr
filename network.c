@@ -13,7 +13,7 @@ network *newNetwork(unsigned nblayer, unsigned *layers)
   {
     float *neurone = (float *) malloc(sizeof(float) * layers[i]);
     for (unsigned j = 0; j < layers[i]; j++)
-      neurone[j] = (float) rand() / (float) RAND_MAX;
+      neurone[j] = (float) rand() / (float) RAND_MAX * 2 - 1;
     t[i - 1] = neurone;
   }
 
@@ -43,7 +43,7 @@ network *newNetwork(unsigned nblayer, unsigned *layers)
     {
       float *target = (float *) malloc(sizeof(float) * layers[i+1]);
       for (unsigned k = 0; k < layers[i+1]; k++)
-        target[k] = (float) rand() / (float) RAND_MAX;
+        target[k] = (float) rand() / (float) RAND_MAX * 2 - 1;
       origin[j] = target;
     }
     w[i] = origin;

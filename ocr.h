@@ -15,6 +15,8 @@ float evaluate(network *, float **, float **, unsigned);
 
 void learn(network *, float **, float **, unsigned, float, float);
 
-//char ocr(bitmap *);
+char ocr(bitmap *, network *);
+
+int getCharIndex(char);
 
 # endif

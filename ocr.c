@@ -72,14 +72,15 @@ float evaluate(network *n, float **samples, float **results, unsigned nbSample)
     for (unsigned j = 0; j < n->layers[last]; j++)
       error += fabsf(n->out[last][j] - results[i][j]);
   }
-  return error;
+  return error / nbSample;
 }
 
 // Learning
 void learn(network *n, float **samples, float **results, unsigned nbSample,
     float speed, float goal)
 {
-  while (evaluate(n, samples, results, nbSample) > goal)
+  float iter = 0;
+  while (iter < 500 || evaluate(n, samples, results, nbSample) > goal)
   {
     for (unsigned j = 0; j < nbSample; j++)
     {
@@ -87,14 +88,32 @@ void learn(network *n, float **samples, float **results, unsigned nbSample,
       backPropagation(n, results[j]);
       update(n, speed);
     }
+    iter++;
   }
 }
 
-/*
 // Main function for recognition
-char ocr(bitmap *img)
+char ocr(bitmap *img, network *n)
 {
-  // TO DO
-  return 'a';
+  float *input = malloc(sizeof(float) * img->width * img->height);
+  for (unsigned i = 0; i < img->width * img->height; i++)
+    input[i] = img->content[i].r;
+
+  feedForward(n, input);
+
+  int best = 0;
+  for (unsigned i = 1; i < n->layers[n->nblayer - 1]; i++)
+    if (n->out[n->nblayer - 1][best] < n->out[n->nblayer - 1][i]) 
+      best = i;
+
+  free(input);
+  return best + 'A';
 }
-*/
+
+int getCharIndex(char c)
+{
+  int i = c - 'A';
+  if (i < 0 || i > 1)
+    errx(1, "Not valid character");
+  return i;
+}
