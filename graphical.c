@@ -3,17 +3,9 @@
 #include <gtk/gtk.h>
 #include "ocr.h"
 
-void leaveButton(GtkWidget *pWindow)
-{
-  GtkWidget *pQBtn;
-
-  pQBtn = gtk_button_new_with_mnemonic("_Quitter");
-  g_signal_connect(G_OBJECT(pQBtn), "clicked", G_CALLBACK(gtk_main_quit), NULL);
-	gtk_container_add(GTK_CONTAINER(pWindow), pQBtn);
-}
-
-
-void recuperer_chemin(GtkWidget *parent_window)
+/* Create a dialog that allows the user to choose a file to open.
+Once the file is open, launch the ocr algorithm on it */
+void get_path(GtkWidget *parent_window)
 {
 	char *filename;
 	GtkWidget *dialog;
@@ -35,25 +27,16 @@ void recuperer_chemin(GtkWidget *parent_window)
     filename = gtk_file_chooser_get_filename(chooser);
   }
 	gtk_widget_destroy (dialog);
-	//FIX ME (remplacer par l'appel à la fonction avec filename
+	//FIX ME (remplacer par l'appel à la fonction avec filename)
 	g_free(filename);
 }
 
-
-void quitter(GtkWidget* widget)
-{
-  // destruction de win et de tout ce qu'il contient
-  gtk_widget_destroy(widget);
-  gtk_main_quit();
-}
- 
-void on_quitter_button()
+/* Create a dialog that make the user confirm if he really 
+wants to quit the program*/
+void leave_dialog()
 {
 	GtkWidget *pWindow;
   GtkWidget *pQuestion;
-  /* Création de la boite de message */
-  /* Type : Question -> GTK_MESSAGE_QUESTION */
-  /* Boutons : 1 OUI, 1 NON -> GTK_BUTTONS_YES_NO */
 	pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_default_size(GTK_WINDOW(pWindow), 320, 200);
 
@@ -61,16 +44,16 @@ void on_quitter_button()
   															     GTK_RESPONSE_ACCEPT,
 														         GTK_MESSAGE_QUESTION,
 														         GTK_BUTTONS_YES_NO,
-        		"Voulez-vous vraiment\nquitter ce programme?");
-  /* Affichage et attente d une réponse */
+        		"Do you really want to\nleave this program?");
+  /* Waiting for an Answer */
   switch(gtk_dialog_run(GTK_DIALOG(pQuestion)))
   {
     case GTK_RESPONSE_YES:
-  	      /* OUI -> on quitte l application */
+  	      /* Yes -> program killed */
           gtk_main_quit();
           break; 
     case GTK_RESPONSE_NO:
-          /* NON -> on détruit la boite de message */
+          /* No -> dialog destroyed*/
           gtk_widget_destroy(pQuestion);
           break;
     }
@@ -83,7 +66,7 @@ int start(int argc, char **argv)
   GtkWidget *pButton[4];
  
   gtk_init(&argc, &argv);
-
+	/* Generate and configure the window */
   pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_default_size(GTK_WINDOW(pWindow), 320, 200);
   gtk_window_set_title(GTK_WINDOW(pWindow), "OCR Project");
@@ -104,24 +87,25 @@ int start(int argc, char **argv)
   gtk_container_add(GTK_CONTAINER(pWindow), GTK_WIDGET(pGrid));
 	gtk_grid_set_row_spacing (GTK_GRID(pGrid), 10); 
   gtk_grid_set_column_spacing (GTK_GRID(pGrid), 100);
-  /* Creation des boutons */
+  /* Create buttons */
   pButton[0]= gtk_button_new_with_mnemonic("_Quit");
   pButton[1]= gtk_button_new_with_mnemonic("_Open a file");
   pButton[2]= gtk_button_new_with_mnemonic("_Launch Program");
  
-  /* Insertion des boutons */
+  /* Insert buttons */
   gtk_grid_attach(GTK_GRID(pGrid), pButton[0],
       						560, 0, 3, 10);
   gtk_grid_attach(GTK_GRID(pGrid), pButton[1],
       						0, 0, 4, 10);
   gtk_grid_attach(GTK_GRID(pGrid), pButton[2],
       						280, 0, 4, 10);
-
+	/* Show buttons */
   gtk_widget_show_all(pWindow);
-  g_signal_connect(G_OBJECT(pButton[0]), "clicked", 
-									 G_CALLBACK(on_quitter_button), (GtkWidget *) pWindow); 
+  /* Associate a function to each button */
+	g_signal_connect(G_OBJECT(pButton[0]), "clicked", 
+									 G_CALLBACK(leave_dialog), (GtkWidget *) pWindow); 
 	g_signal_connect(G_OBJECT(pButton[1]), "clicked", 
-									 G_CALLBACK(recuperer_chemin), pWindow);
+									 G_CALLBACK(get_path), pWindow);
 	/*g_signal_connect(G_OBJECT(pButton[2]), "clicked", 
                    G_CALLBACK(REMPLACER PAR LA FONCTION QUI LANCE LE PROGRAMME),
 																														NULL);*/
