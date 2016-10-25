@@ -28,13 +28,13 @@ float **createSamples(char *path, int *nbSample)
     queue *line = deQueue(text);
     while (line->length > 0)
     {
-      bitmap *lettre = deQueue(line);
-      resize(lettre);
-      binarize(lettre);
+      bitmap *letter = deQueue(line);
+      resize(letter);
+      binarize(letter);
       for (int i = 0; i < 256; i++)
-        samples[sample][i] = lettre->content[i].r;
+        samples[sample][i] = letter->content[i].r;
       sample++;
-      freeBitmap(lettre);
+      freeBitmap(letter);
     }
     free(line);
   }
@@ -105,32 +105,41 @@ int main(int argc, char *argv[])
     if (argc != 3)
       return 0;
     network *n = loadNetwork("network.save");
-    char txt[256];
-    int i = 0;
 
     bitmap *img = loadBmp(argv[2]);
     draw(img);
     queue *q = segmentation(img);
+    element *el = q->first;
+    int i = 0;
+    for (int i = 0; i < q->length; i++)
+    {
+      queue *q2 = el->obj;
+      i += q2->length + 1;
+      el = el->next;
+    }
+    i = 0;
+
+    char txt[i];
     while (q->length > 0)
     {
-      queue *ligne = deQueue(q);  
-      while (ligne->length > 0)
+      queue *line = deQueue(q);  
+      while (line->length > 0)
       {
-        bitmap *lettre = deQueue(ligne);
-        resize(lettre);
-        binarize(lettre);
-        draw(lettre);
-        txt[i] = ocr(lettre, n);
-        freeBitmap(lettre);
+        bitmap *letter = deQueue(line);
+        resize(letter);
+        binarize(letter);
+        draw(letter);
+        txt[i] = ocr(letter, n);
+        freeBitmap(letter);
         printf("%c\n", txt[i]);
         i++;
       }
+      free(line);
       txt[i] = '\n';
       i++;
     }
-    printf("--------------------\n");
-    printf("%s", txt);
-    printf("--------------------\n");
+    printf("--------------------\n%s--------------------\n", txt);
+    free(q);
     freeBitmap(img);
     freeNetwork(n);
   }
