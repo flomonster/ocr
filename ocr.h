@@ -19,4 +19,6 @@ char ocr(bitmap *, network *);
 
 int getCharIndex(char);
 
+char getCharFromIndex(int);
+
 # endif
