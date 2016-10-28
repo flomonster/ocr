@@ -43,10 +43,8 @@ float **createSamples(char *path, int *nbSample)
   return samples;
 }
 
-float **createResults(char *text, int nbSample)
+float **createResults(char *text, int nbSample, int nbOutput)
 {
-  int nbOutput = 2;
-
   float **results = malloc(sizeof(float *) * nbSample);
   for (int i = 0; i < nbSample; i++)
   {
@@ -74,40 +72,52 @@ int main(int argc, char *argv[])
     return 0;
   if (argv[1][0] == '0')
   {
+    unsigned *layers = malloc(sizeof(unsigned) * 3);
+    layers[0] = 256;
+    layers[1] = 55;
+    layers[2] = 66;
+    network *n = newNetwork(3, layers);
+    
+    printf("Generating the network :\n");
+    printf("  - Layer size : %d | %d | %d\n", layers[0], layers[1], layers[2]);
+    printf("  - Creation of network.save\n");
+    saveNetwork("network.save", n);
+    printf("DONE\n");
+
+    freeNetwork(n);
+  }
+  else if (argv[1][0] == '1')
+  {
     if (argc != 4)
       return 0;
 
-    unsigned *layers = malloc(sizeof(unsigned) * 3);
-    layers[0] = 256;
-    layers[1] = 15;
-    layers[2] = 2;
-    network *n = newNetwork(3, layers);
+    network *n = loadNetwork("network.save");
     int *nbSample = malloc(sizeof(int));
     float **inputs = createSamples(argv[2], nbSample);
-    float **outputs = createResults(argv[3], *nbSample);
+    int nbOutput = n->layers[n->nblayer - 1];
+    float **outputs = createResults(argv[3], *nbSample, nbOutput);
     clock_t chrono = clock();
-    learn(n, inputs, outputs, *nbSample, .5, .1);
+    learn(n, inputs, outputs, *nbSample, .5, .05);
     printf("LEARNING :\n");
     printf("  - Time : %.6f (seconds)\n", (clock() - chrono) / 1000000.0F);
     
-    printf("  - Creation of network.save\n");
+    printf("  - Update of network.save\n");
     saveNetwork("network.save", n);
 
-    printf("  - DONE\n");
+    printf("DONE\n");
 
     freeSamples(inputs, *nbSample);
     freeSamples(outputs, *nbSample);
     free(nbSample);
     freeNetwork(n);
   }
-  else if (argv[1][0] == '1')
+  else if (argv[1][0] == '2')
   {
     if (argc != 3)
       return 0;
     network *n = loadNetwork("network.save");
 
     bitmap *img = loadBmp(argv[2]);
-    draw(img);
     queue *q = segmentation(img);
     element *el = q->first;
     int i = 0;
@@ -117,9 +127,9 @@ int main(int argc, char *argv[])
       i += q2->length + 1;
       el = el->next;
     }
-    i = 0;
 
     char txt[i];
+    i = 0;
     while (q->length > 0)
     {
       queue *line = deQueue(q);  

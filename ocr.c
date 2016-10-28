@@ -4,6 +4,16 @@
 # include <err.h>
 # include "bitmap.h"
 # include "network.h"
+# include "ocr.h"
+
+char alphabet[66] = {
+'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',', '?',
+'!'
+};
 
 // Sigmoid function
 float sigmoid(float x)
@@ -107,13 +117,18 @@ char ocr(bitmap *img, network *n)
       best = i;
 
   free(input);
-  return best + 'A';
+  return getCharFromIndex(best);
 }
 
 int getCharIndex(char c)
 {
-  int i = c - 'A';
-  if (i < 0 || i > 1)
-    errx(1, "Not valid character");
-  return i;
+  for (size_t i = 0; i < sizeof(alphabet); i++)
+    if (alphabet[i] == c)
+      return i;
+  errx(1, "The character is not valid !");
+}
+
+char getCharFromIndex(int i)
+{
+  return alphabet[i];
 }
