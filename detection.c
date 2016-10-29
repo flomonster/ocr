@@ -4,44 +4,6 @@
 # include "bitmap.h"
 # include "detection.h"
 
-// Create new queue
-queue *newQueue()
-{
-  queue *q =  malloc(sizeof(queue));
-  q->length = 0;
-  return q;
-}
-
-// Append element to a queue
-void enQueue(queue *q, void *obj)
-{
-  element *elt = malloc(sizeof(element));
-  elt->obj = obj;
-
-  if (q->length == 0)
-    q->first = elt;
-  else 
-    q->last->next = elt;
-  q->last = elt;
-  q->length++;
-}
-
-// Remove and give you the first element of a queue
-void *deQueue(queue *q)
-{
-  if (q->length > 0)
-  {
-    void *obj = q->first->obj;
-    element *save = q->first;
-    q->first = q->first->next;
-    free(save);
-    q->length--;
-    return obj;
-  }
-  else 
-    errx(1, "Can not dequeue : length = 0 !");
-}
-
 // Put a marker for each line with a letter
 void putLineMarker(bitmap *img, char *array)
 {
@@ -72,7 +34,6 @@ void putColumnMarker(bitmap *img, unsigned min, unsigned max, char *array)
 bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
     unsigned width, unsigned height)
 {
-  
   color *content = malloc(sizeof(color) * height * width);
   for (unsigned i = 0; i < height; i++)
   {
@@ -82,6 +43,16 @@ bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
   bitmap *bmp = newBitmap(width, height, content);
   return bmp;
 }
+
+/*int lineSpace(char *lineMarker, int length)
+{
+  int space = 0; 
+  char b = 1;
+  for (unsigned i = 0; i < length  b == 1)
+  {
+
+  }
+}*/
 
 // Create a queue with all letter in a bitmap
 queue *segmentation(bitmap *img)
@@ -94,7 +65,7 @@ queue *segmentation(bitmap *img)
 
   queue *q = newQueue();
   char lineMarker[img->height];
-  char columnMarker[img->width]; 
+  char columnMarker[img->width];
   putLineMarker(bmp, lineMarker);
   unsigned Y, X;
 
