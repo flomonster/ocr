@@ -44,15 +44,52 @@ bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
   return bmp;
 }
 
-/*int lineSpace(char *lineMarker, int length)
+float columnSpaceAverage(char *columnMarker, unsigned length)
 {
-  int space = 0; 
+  float share = 0;
+  float nbSpaces = 0;
+  float spaces = 0;
   char b = 1;
-  for (unsigned i = 0; i < length  b == 1)
-  {
 
+  unsigned i = 0;
+  while (i < length)
+  {
+    if (columnMarker[i] == 0 && b == 1)
+    {
+      while (i < length && columnMarker[i] == 0)
+        i++;
+    }
+
+    if (columnMarker[i] == 1 && b == 1)
+    {
+      b = 0;
+      while (i < length && columnMarker[i] == 1)
+        i++;
+    }
+
+    if (columnMarker[i] == 0 && b == 0)
+    {
+      share = 0;
+      while (columnMarker[i] == 0 && b == 0)
+      {
+        share++;
+        i++;
+      }
+      if (i != length)
+      {
+        spaces += share;
+        nbSpaces++;
+      }
+    }
+
+    if (columnMarker[i] == 1 && b == 0)
+    {
+      while (i < length && columnMarker[i] == 1)
+        i++;
+    }
   }
-}*/
+  return spaces / nbSpaces;
+}
 
 // Create a queue with all letter in a bitmap
 queue *segmentation(bitmap *img)
@@ -68,11 +105,12 @@ queue *segmentation(bitmap *img)
   char columnMarker[img->width];
   putLineMarker(bmp, lineMarker);
   unsigned Y, X;
+  float columnSpace;
 
   unsigned i = 0; 
   while (i < img->height)
   {
-    if (lineMarker[i] == 1)
+    if (i < img->height && lineMarker[i] == 1)
     {
       Y = i;
       while (i < img->height && lineMarker[i] == 1)
@@ -81,19 +119,35 @@ queue *segmentation(bitmap *img)
       queue *line = newQueue();
       putColumnMarker(bmp, Y, i, columnMarker);
 
+      columnSpace = columnSpaceAverage(columnMarker, img->width);
+      queue *word = newQueue();
+
       unsigned j = 0;
       while (j < img->width)
       {
-        if (columnMarker[j] == 1)
+        if (j < img->width && columnMarker[j] == 1)
         {
           X = j;
-          while (columnMarker[j] == 1)
+          while (j < img->width && columnMarker[j] == 1)
             j++;
+
           bitmap *bmpResult = cutBmp(img, X, Y, j - X, i - Y);
-          enQueue(line, bmpResult);
+          enQueue(word, bmpResult);
         }
-        j++;
+        else 
+        {
+          X = j;
+          while (j < img->width && columnMarker[j] == 0)
+            j++;
+
+          if (j - X > columnSpace && j < img->width && word->length > 0)
+          {
+            enQueue(line, word);
+            word = newQueue();
+          }
+        }
       }
+      enQueue(line, word);
       enQueue(q, line);
     }
     i++;
