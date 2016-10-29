@@ -11,6 +11,8 @@ void putColumnMarker(bitmap *, unsigned, unsigned, char *);
 
 bitmap *cutBmp(bitmap *, unsigned, unsigned, unsigned, unsigned);
 
+float columSpaceAverage(char *, unsigned);
+
 queue *segmentation(bitmap *);
 
 # endif
