@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
   {
     unsigned *layers = malloc(sizeof(unsigned) * 3);
     layers[0] = 256;
-    layers[1] = 55;
+    layers[1] = 60;
     layers[2] = 66;
     network *n = newNetwork(3, layers);
     
@@ -88,17 +88,38 @@ int main(int argc, char *argv[])
   }
   else if (argv[1][0] == '1')
   {
-    if (argc != 4)
+    if (argc != 3)
       return 0;
+
+    char pathImg[100];
+    char text[1000];
+    size_t i = 0;
+
+    FILE *fp = fopen(argv[2] ,"r");
+    do 
+    {
+      fread(pathImg + i, 1, 1, fp);
+      i++;
+    } while (pathImg[i-1] != '\n');
+    pathImg[i-1] = 0;
+    i = 0;
+
+    do
+    {
+      fread(text + i, 1, 1, fp);
+      i++;
+    } while (text[i-1] != '\0');
+
+    fclose(fp);
 
     network *n = loadNetwork("network.save");
     int *nbSample = malloc(sizeof(int));
-    float **inputs = createSamples(argv[2], nbSample);
+    float **inputs = createSamples(pathImg, nbSample);
     int nbOutput = n->layers[n->nblayer - 1];
-    float **outputs = createResults(argv[3], *nbSample, nbOutput);
+    float **outputs = createResults(text, *nbSample, nbOutput);
     clock_t chrono = clock();
-    learn(n, inputs, outputs, *nbSample, .5, .05);
     printf("LEARNING :\n");
+    learn(n, inputs, outputs, *nbSample, .2, .075);
     printf("  - Time : %.6f (seconds)\n", (clock() - chrono) / 1000000.0F);
     
     printf("  - Update of network.save\n");
@@ -118,16 +139,16 @@ int main(int argc, char *argv[])
     network *n = loadNetwork("network.save");
 
     bitmap *img = loadBmp(argv[2]);
+    draw(img);
     queue *q = segmentation(img);
     element *el = q->first;
     int i = 0;
-    for (int i = 0; i < q->length; i++)
+    for (int j = 0; j < q->length; j++)
     {
       queue *q2 = el->obj;
       i += q2->length + 1;
       el = el->next;
     }
-
     char txt[i];
     i = 0;
     while (q->length > 0)

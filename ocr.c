@@ -16,7 +16,7 @@ char alphabet[66] = {
 };
 
 // Sigmoid function
-float sigmoid(float x)
+__attribute__((const)) float sigmoid(float x) 
 {
   return 1 / (1 + exp(-x));
 }
@@ -89,16 +89,15 @@ float evaluate(network *n, float **samples, float **results, unsigned nbSample)
 void learn(network *n, float **samples, float **results, unsigned nbSample,
     float speed, float goal)
 {
-  int iter = 0;
-  while (iter < 500 || evaluate(n, samples, results, nbSample) > goal)
+  while (evaluate(n, samples, results, nbSample) > goal)
   {
-    for (unsigned j = 0; j < nbSample; j++)
-    {
-      feedForward(n, samples[j]);
-      backPropagation(n, results[j]);
-      update(n, speed);
-    }
-    iter = (iter + 1) % 501;
+    for (int i = 0; i < 1000; i++)
+      for (unsigned j = 0; j < nbSample; j++)
+      {
+        feedForward(n, samples[j]);
+        backPropagation(n, results[j]);
+        update(n, speed);
+      }
   }
 }
 
