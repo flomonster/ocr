@@ -34,7 +34,13 @@ struct s_bitmapInfoHeader
 # pragma pack(pop)
 typedef struct s_bitmapInfoHeader bitmapInfoHeader;
 
-// Create a new color with RGB as argument 
+/**
+ * \brief Create a new color with RGB as argument
+ *
+ * \param r red component of the new color
+ * \param g green component of the new color
+ * \param b blue component of the new color
+ */
 color newColor(unsigned char r, unsigned char g, unsigned char b)
 {
   color col;
@@ -66,8 +72,12 @@ void freeBitmap(bitmap *img)
   free(img);
 }
 
-// Print a # for each pixel with R == 0 in a bitmap in argument
-void draw(bitmap *img)
+/**
+ * \brief Print a # for each pixel with R == 0 in a bitmap in argument
+ *
+ * \param img the image which will be draw
+ */
+ void draw(bitmap *img)
 {
   printf("+");
   for (unsigned i = 0; i < img->width + 2; i++)
@@ -86,6 +96,11 @@ void draw(bitmap *img)
   printf("+\n");
 }
 
+/**
+ * \brief put the image in black and white
+ *
+ * \param img the image which will be binarize
+ */
 void binarize(bitmap *img)
 {
   unsigned short c = 0;
@@ -99,6 +114,11 @@ void binarize(bitmap *img)
   }
 }
 
+/**
+ * \brief resize an image in 16x16 pixels
+ * 
+ * \pram img the image which will be resize
+ */
 void resize(bitmap *img)
 {
   unsigned newWidth = 16;
