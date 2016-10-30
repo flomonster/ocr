@@ -48,8 +48,8 @@ void putColumnMarker(bitmap *img, unsigned min, unsigned max, char *array)
  * \param img full img
  * \param X min x
  * \param Y min y
- * \param width max X
- * \param height max Y
+ * \param width the width of the new bitmap 
+ * \param height the height of the new bitmap 
  * *
  */
 bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
