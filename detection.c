@@ -66,16 +66,15 @@ bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
 }
 
 /**
- * \brief find the space average of one line
+ * \brief find the 
  *
  * \param columnMarker array where there are marker for each pixel 
  * \param length is the length of the columnMarker
  */
-float columnSpaceAverage(char *columnMarker, unsigned length)
+float letterLengthAverage(char *columnMarker, unsigned length)
 {
-  float share = 0;
-  float nbSpaces = 0;
-  float spaces = 0;
+  float nb = 0;
+  float letter = 0;
 
   unsigned i = 0;
   while (i < length && columnMarker[i] == 0)
@@ -84,26 +83,18 @@ float columnSpaceAverage(char *columnMarker, unsigned length)
   {
     if (columnMarker[i] == 1)
     {
-      while (i < length && columnMarker[i] == 1)
-        i++;
-    }
-
-    if (columnMarker[i] == 0)
-    {
-      share = 0;
-      while (columnMarker[i] == 0)
+      while (columnMarker[i] == 1)
       {
-        share++;
+        letter++;
         i++;
       }
-      if (i != length)
-      {
-        spaces += share;
-        nbSpaces++;
-      }
+      nb++;
     }
+    else
+      while (i < length && columnMarker[i] == 0)
+        i++;
   }
-  return spaces / nbSpaces;
+  return letter / nb;
 }
 
 /* 
@@ -124,7 +115,7 @@ queue *segmentation(bitmap *img)
   char columnMarker[img->width];
   putLineMarker(bmp, lineMarker);
   unsigned Y, X;
-  float columnSpace;
+  float letterAverage;
 
   unsigned i = 0; 
   while (i < img->height)
@@ -137,10 +128,9 @@ queue *segmentation(bitmap *img)
       
       queue *line = newQueue();
       putColumnMarker(bmp, Y, i, columnMarker);
-
-      columnSpace = columnSpaceAverage(columnMarker, img->width);
+      letterAverage = letterLengthAverage(columnMarker, img->width);
       queue *word = newQueue();
-
+      
       unsigned j = 0;
       while (j < img->width)
       {
@@ -159,7 +149,8 @@ queue *segmentation(bitmap *img)
           while (j < img->width && columnMarker[j] == 0)
             j++;
 
-          if (j - X > columnSpace && j < img->width && word->length > 0)
+          if ((float)j - X > letterAverage && j < img->width &&
+              word->length > 0)
           {
             enQueue(line, word);
             word = newQueue();
