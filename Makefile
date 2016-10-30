@@ -1,7 +1,7 @@
 # Compilers and options
 CC=gcc
 CPPFLAGS= -MMD 
-CFLAGS= -Wall -Wextra -std=c99 -O2 `pkg-config --cflags --libs gtk+-3.0`
+CFLAGS= -Wall -Wextra -std=c99 -O3 `pkg-config --cflags --libs gtk+-3.0`
 LDFLAGS=
 LDLIBS= -lm
  

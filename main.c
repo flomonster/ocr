@@ -16,12 +16,18 @@ float **createSamples(char *path, int *nbSample)
   bitmap *img = loadBmp(path);
   queue *text = segmentation(img);
   *nbSample = 0;
-  element *el = text->first;
+  element *el1 = text->first;
   for (int i = 0; i < text->length; i++)
   {
-    queue *q = el->obj;
-    *nbSample += q->length;
-    el = el->next;
+    queue *q1 = el1->obj;
+    element *el2 = q1->first;
+    for (int j = 0; j < q1->length; j++)
+    {
+      queue *q2 = el2->obj; 
+      *nbSample += q2->length;
+      el2 = el2->next;
+    }
+    el1 = el1->next;
   }
 
   float **samples = malloc(sizeof(float *) * *nbSample);
@@ -34,13 +40,18 @@ float **createSamples(char *path, int *nbSample)
     queue *line = deQueue(text);
     while (line->length > 0)
     {
-      bitmap *letter = deQueue(line);
-      resize(letter);
-      binarize(letter);
-      for (int i = 0; i < 256; i++)
-        samples[sample][i] = letter->content[i].r;
-      sample++;
+      queue *word = deQueue(line);
+      while (word->length > 0)
+      {
+        bitmap *letter = deQueue(word);
+        resize(letter);
+        binarize(letter);
+        for (int i = 0; i < 256; i++)
+          samples[sample][i] = letter->content[i].r;
+        sample++;
       freeBitmap(letter);
+      }
+      free(word);
     }
     free(line);
   }
@@ -73,7 +84,7 @@ float **createResults(char *text, int nbSample, int nbOutput)
 }
 
 /**
- * \brief free all components of an exemple
+ * \brief free all components of a sample
  *
  * \param samples the inputs or outputs of a sample
  * \param nbSample the number of character in the sample
@@ -171,7 +182,14 @@ int main(int argc, char *argv[])
     for (int j = 0; j < q->length; j++)
     {
       queue *q2 = el->obj;
-      i += q2->length + 1;
+      element *el2 = q2->first;
+      for (int j = 0; j < q2->length; j++)
+      {
+        queue *q3 = el2->obj;
+        i += q3->length + 1;
+        el2 = el2->next;
+      }
+      i++;
       el = el->next;
     }
     char txt[i + 1];
@@ -182,13 +200,20 @@ int main(int argc, char *argv[])
       queue *line = deQueue(q);  
       while (line->length > 0)
       {
-        bitmap *letter = deQueue(line);
-        resize(letter);
-        binarize(letter);
-        draw(letter);
-        txt[i] = ocr(letter, n);
-        freeBitmap(letter);
-        printf("%c\n", txt[i]);
+        queue *word = deQueue(line);
+        while (word->length > 0)
+        {
+          bitmap *letter = deQueue(word);
+          resize(letter);
+          binarize(letter);
+          draw(letter);
+          txt[i] = ocr(letter, n);
+          freeBitmap(letter);
+          printf("%c\n", txt[i]);
+          i++;
+        }
+        free(word);
+        txt[i] = ' ';
         i++;
       }
       free(line);
