@@ -1,7 +1,7 @@
 # include "queue.h"
 
 /**
- * Create new queue
+ * \brief  Create new queue
  */
 queue *newQueue()
 {
@@ -11,10 +11,10 @@ queue *newQueue()
 }
 
 /**
- * Append element to a queue
+ * \brief  Append element to a queue
  *
- * @param q: the queue to be modified
- * @param obj: the element to be added
+ * \param q: the queue to be modified
+ * \param obj: the element to be added
  */
 void enQueue(queue *q, void *obj)
 {
@@ -30,9 +30,9 @@ void enQueue(queue *q, void *obj)
 }
 
 /**
- * Remove and give you the first element of a queue
+ * \brief Remove and give you the first element of a queue
  *
- * @param q: the queue to be  modified
+ * \param q: the queue to be  modified
  */
 void *deQueue(queue *q)
 {

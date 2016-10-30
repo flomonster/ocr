@@ -4,7 +4,12 @@
 # include "bitmap.h"
 # include "detection.h"
 
-// Put a marker for each line with a letter
+/**
+ * \brief Put a marker for each line with a letter
+ *
+ * \param img the full image
+ * \param array where marker is put in function of the img 
+ */
 void putLineMarker(bitmap *img, char *array)
 {
   for(unsigned i = 0; i < img->height; i++)
@@ -17,7 +22,14 @@ void putLineMarker(bitmap *img, char *array)
   }
 }
 
-// Put a marker for each column with a letter
+/** 
+ * \brief Put a marker for each column with a letter
+ *  
+ * \param img one line of the full image
+ * \param min X min
+ * \param max X max
+ * \param array where marker is put in function of the img * 
+ */
 void putColumnMarker(bitmap *img, unsigned min, unsigned max, char *array)
 {
   for(unsigned i = 0; i < img->width; i++)
@@ -30,7 +42,16 @@ void putColumnMarker(bitmap *img, unsigned min, unsigned max, char *array)
   }
 }
 
-// Create a bitmap from an other 
+/**
+ * \brief Create a bitmap from an other
+ *
+ * \param img full img
+ * \param X min x
+ * \param Y min y
+ * \param width max X
+ * \param height max Y
+ * *
+ */
 bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
     unsigned width, unsigned height)
 {
@@ -44,33 +65,33 @@ bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
   return bmp;
 }
 
+/**
+ * \brief find the space average of one line
+ *
+ * \param columnMarker array where there are marker for each pixel 
+ * \param length is the length of the columnMarker
+ */
 float columnSpaceAverage(char *columnMarker, unsigned length)
 {
   float share = 0;
   float nbSpaces = 0;
   float spaces = 0;
-  char b = 1;
 
   unsigned i = 0;
+  while (i < length && columnMarker[i] == 0)
+    i++;
   while (i < length)
   {
-    if (columnMarker[i] == 0 && b == 1)
+    if (columnMarker[i] == 1)
     {
-      while (i < length && columnMarker[i] == 0)
-        i++;
-    }
-
-    if (columnMarker[i] == 1 && b == 1)
-    {
-      b = 0;
       while (i < length && columnMarker[i] == 1)
         i++;
     }
 
-    if (columnMarker[i] == 0 && b == 0)
+    if (columnMarker[i] == 0)
     {
       share = 0;
-      while (columnMarker[i] == 0 && b == 0)
+      while (columnMarker[i] == 0)
       {
         share++;
         i++;
@@ -81,17 +102,15 @@ float columnSpaceAverage(char *columnMarker, unsigned length)
         nbSpaces++;
       }
     }
-
-    if (columnMarker[i] == 1 && b == 0)
-    {
-      while (i < length && columnMarker[i] == 1)
-        i++;
-    }
   }
   return spaces / nbSpaces;
 }
 
-// Create a queue with all letter in a bitmap
+/* 
+ * \brief Create a queue with all letter in a bitmap
+ *
+ * \param img the full image
+ */
 queue *segmentation(bitmap *img)
 {
   color content[img->height * img->width];
