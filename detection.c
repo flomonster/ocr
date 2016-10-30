@@ -66,35 +66,31 @@ bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
 }
 
 /**
- * \brief find the 
+ * \brief find the length average of letters for one line 
  *
  * \param columnMarker array where there are marker for each pixel 
- * \param length is the length of the columnMarker
+ * \param width is the width of the columnMarker
  */
-float letterLengthAverage(char *columnMarker, unsigned length)
+float letterLengthAverage(char *columnMarker, unsigned width)
 {
-  float nb = 0;
-  float letter = 0;
+  float nbLetter = 0;
+  float sumWidthLetter = 0;
 
   unsigned i = 0;
-  while (i < length && columnMarker[i] == 0)
+  while (i < width && columnMarker[i] == 0)
     i++;
-  while (i < length)
+  while (i < width)
   {
-    if (columnMarker[i] == 1)
+    while (i < width && columnMarker[i] == 1)
     {
-      while (columnMarker[i] == 1)
-      {
-        letter++;
-        i++;
-      }
-      nb++;
+      sumWidthLetter++;
+      i++;
     }
-    else
-      while (i < length && columnMarker[i] == 0)
+    nbLetter++;
+    while (i < width && columnMarker[i] == 0)
         i++;
   }
-  return letter / nb;
+  return sumWidthLetter / nbLetter;
 }
 
 /* 
@@ -149,8 +145,8 @@ queue *segmentation(bitmap *img)
           while (j < img->width && columnMarker[j] == 0)
             j++;
 
-          if ((float)j - X > letterAverage && j < img->width &&
-              word->length > 0)
+          if ((float)j - X > letterAverage / 2 && j < img->width &&
+              word->length )
           {
             enQueue(line, word);
             word = newQueue();

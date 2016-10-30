@@ -73,7 +73,7 @@ void freeBitmap(bitmap *img)
 }
 
 /**
- * \brief Print a # for each pixel with R == 0 in a bitmap in argument
+ * \brief Draw an image in console 
  *
  * \param img the image which will be draw
  */
