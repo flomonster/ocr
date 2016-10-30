@@ -5,6 +5,12 @@
 # include "ocr.h"
 # include "detection.h"
 
+/**
+ * \brief Create samples from an image
+ *
+ * \param path location of the image
+ * \param nbSample the number of character in the image
+ */
 float **createSamples(char *path, int *nbSample)
 {
   bitmap *img = loadBmp(path);
@@ -43,6 +49,13 @@ float **createSamples(char *path, int *nbSample)
   return samples;
 }
 
+/**
+ * \brief Create the results of samples
+ *
+ * \param text the expected text
+ * \param nbsample the length of the text
+ * \param nbOutput the number of possibile outputs
+ */
 float **createResults(char *text, int nbSample, int nbOutput)
 {
   float **results = malloc(sizeof(float *) * nbSample);
@@ -59,6 +72,12 @@ float **createResults(char *text, int nbSample, int nbOutput)
   return results;
 }
 
+/**
+ * \brief free all components of an exemple
+ *
+ * \param samples the inputs or outputs of a sample
+ * \param nbSample the number of character in the sample
+ */
 void freeSamples(float **samples, int nbSample)
 {
   for (int i = 0; i < nbSample; i++)
@@ -66,6 +85,12 @@ void freeSamples(float **samples, int nbSample)
   free(samples);
 }
 
+/**
+ * \brief the main function
+ *
+ * \param argc the number of params
+ * \param argv a table of string
+ */
 int main(int argc, char *argv[])
 {
   if (argc < 2)
@@ -149,7 +174,8 @@ int main(int argc, char *argv[])
       i += q2->length + 1;
       el = el->next;
     }
-    char txt[i];
+    char txt[i + 1];
+    txt[i] = 0;
     i = 0;
     while (q->length > 0)
     {

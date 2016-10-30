@@ -15,13 +15,22 @@ char alphabet[66] = {
 '!'
 };
 
-// Sigmoid function
+/**
+ * \brief Sigmoid function
+ * 
+ * \param x a real number
+ */
 __attribute__((const)) float sigmoid(float x) 
 {
   return 1 / (1 + exp(-x));
 }
 
-// Forward propagation
+/**
+ * \brief the activation function of a neural network
+ * 
+ * \param n the neural network
+ * \param inputs values for the input layer
+ */
 void feedForward(network *n, float *inputs)
 {
   for (unsigned i = 0; i < n->layers[0]; i++)
@@ -37,7 +46,12 @@ void feedForward(network *n, float *inputs)
     }
 }
 
-// Backward propagation
+/**
+ * \brief calculates the gradient of the loss function
+ *
+ * \param n the neural network
+ * \param outputs expected values
+ */
 void backPropagation(network *n, float *outputs)
 {
   unsigned last = n->nblayer - 1;
@@ -57,7 +71,12 @@ void backPropagation(network *n, float *outputs)
     }
 }
 
-// Update weight and threshold
+/**
+ * \brief calculates a new value for weight and threshold
+ *
+ * \param n the neural network
+ * \param speed the learning rate
+ */
 void update(network *n, float speed)
 {
   for (unsigned i = 0; i < n->nblayer - 1; i++)
@@ -71,7 +90,14 @@ void update(network *n, float speed)
   }
 }
 
-// Ealuates a neural network
+/**
+ * \brief Evaluate a neural network with samples
+ *
+ * \param n the neural network
+ * \param samples the inputs of samples
+ * \param results expected outputs of samples
+ * \param nbSample the number of samples
+ */
 float evaluate(network *n, float **samples, float **results, unsigned nbSample)
 {
   float error = 0;
@@ -85,12 +111,21 @@ float evaluate(network *n, float **samples, float **results, unsigned nbSample)
   return error / nbSample;
 }
 
-// Learning
+/**
+ * \brief entrain a neural network with samples
+ *
+ * \param n the neural network
+ * \param samples the inputs of samples
+ * \param results the outputs of samples
+ * \param nbSample the number of samples
+ */
 void learn(network *n, float **samples, float **results, unsigned nbSample,
     float speed, float goal)
 {
-  while (evaluate(n, samples, results, nbSample) > goal)
+  float error = 1;
+  while (error > goal)
   {
+    printf("  - STATUS : %d%%\n", (int) ((1 - error) / (1 - goal) * 100));
     for (int i = 0; i < 1000; i++)
       for (unsigned j = 0; j < nbSample; j++)
       {
@@ -98,10 +133,17 @@ void learn(network *n, float **samples, float **results, unsigned nbSample,
         backPropagation(n, results[j]);
         update(n, speed);
       }
+    error = evaluate(n, samples, results, nbSample);
   }
+  printf("  - STATUS : 100%%\n");
 }
 
-// Main function for recognition
+/**
+ * \brief optical character recognition
+ *
+ * \param img a picture of a character (16x16)
+ * \param n the neural network
+ */
 char ocr(bitmap *img, network *n)
 {
   float *input = malloc(sizeof(float) * img->width * img->height);
@@ -119,6 +161,11 @@ char ocr(bitmap *img, network *n)
   return getCharFromIndex(best);
 }
 
+/**
+ * \brief give the index corresponding with the character c
+ *
+ * \param c the character
+ */
 int getCharIndex(char c)
 {
   for (size_t i = 0; i < sizeof(alphabet); i++)
@@ -127,6 +174,11 @@ int getCharIndex(char c)
   errx(1, "The character is not valid !");
 }
 
+/**
+ * \brief give the character corresponding with the index i
+ *
+ * \param i the index
+ */
 char getCharFromIndex(int i)
 {
   return alphabet[i];

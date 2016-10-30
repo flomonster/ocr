@@ -3,7 +3,12 @@
 # include <err.h>
 # include "network.h"
 
-// Generate a neural network
+/**
+ * \brief create a new neural network
+ *
+ * \param nblayer the number of layers
+ * \param layers a table of the number of neurone in each layer
+ */
 network *newNetwork(unsigned nblayer, unsigned *layers)
 {
   network *n = (network *) malloc(sizeof(network));
@@ -58,7 +63,11 @@ network *newNetwork(unsigned nblayer, unsigned *layers)
   return n;
 } 
 
-// Free the memory used by a neural network
+/**
+ * \brief free all components of a network
+ *
+ * \param n the neural network
+ */
 void freeNetwork(network *n)
 {
   for (unsigned i = 0; i < n->nblayer - 1; i++)
@@ -81,7 +90,11 @@ void freeNetwork(network *n)
   free(n);
 }
 
-// Load the network from a file
+/**
+ * \brief load a neural network from a save
+ *
+ * \param path location of the save
+ */
 network *loadNetwork(char *path)
 {
   
@@ -111,7 +124,12 @@ network *loadNetwork(char *path)
   return n;
 }
 
-// Save the network in a file
+/**
+ * \brief save weights anf thresholds of a neural network
+ *
+ * \param path location of the new file
+ * \param n the neural network to save
+ */
 void saveNetwork(char *path, network *n)
 {
   FILE *file = fopen(path, "w");
