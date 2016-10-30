@@ -44,7 +44,13 @@ color newColor(unsigned char r, unsigned char g, unsigned char b)
   return col;
 }
 
-// Create a new bitmap with width, height and and color array of it
+/**
+ * \brief Create a new bitmap with width, height and and color array of it
+ *
+ * \param width is the with of the new bitmap
+ * \param height is the height of the new bitmap
+ * \param content is the full image
+ */
 bitmap *newBitmap(unsigned width, unsigned height, color *content)
 {
   bitmap *img = malloc(sizeof(bitmap));
@@ -133,28 +139,33 @@ void resize(bitmap *img)
   img->height = newHeight;
 }
 
-// Load a bmp file with a path in argument 
+/**
+ * \brief Load a bmp file with a path in argument
+ *
+ * \param path is image path
+ */
 bitmap *loadBmp(char *path)
 {
-	FILE *fp = fopen(path, "rb");
-	bitmapFileHeader fileHeader;
-	bitmapInfoHeader infoHeader;
-	bitmap *bmp = malloc(sizeof(bitmap));
+  FILE *fp = fopen(path, "rb");
+  bitmapFileHeader fileHeader;
+  bitmapInfoHeader infoHeader;
+  bitmap *bmp = malloc(sizeof(bitmap));
 	
-	fread(&fileHeader, sizeof(bitmapFileHeader), 1, fp);
-
+  fread(&fileHeader, sizeof(bitmapFileHeader), 1, fp);
+  
   if (fileHeader.bfType != 0x4D42)
   {
     fclose(fp);
     errx(1, "The expected file is not a .bmp");
   }
-	fread(&infoHeader, sizeof(bitmapInfoHeader), 1, fp);
-	fseek(fp, fileHeader.bfOffBytes, SEEK_SET);
-	
-  bmp->width = infoHeader.biWidth;
-	bmp->height = infoHeader.biHeight;
-	bmp->content = malloc(sizeof(color) * bmp->width * bmp->height);
   
+  fread(&infoHeader, sizeof(bitmapInfoHeader), 1, fp);
+  fseek(fp, fileHeader.bfOffBytes, SEEK_SET);
+
+  bmp->width = infoHeader.biWidth;
+  bmp->height = infoHeader.biHeight;
+  bmp->content = malloc(sizeof(color) * bmp->width * bmp->height);
+
   int padding = 4 - (bmp->width * 3) % 4;
   if (padding == 4)
     padding = 0;
@@ -164,12 +175,12 @@ bitmap *loadBmp(char *path)
   {
     for (unsigned j = 0; j < bmp->width; j++)
     {
-	    fread(&px, 3, 1, fp);
+      fread(&px, 3, 1, fp);
       bmp->content[i * bmp->width + j] = px;
     }
     fseek(fp, padding, SEEK_CUR);
-  } 
-	
-	fclose(fp);	
-	return bmp;
+  }
+
+  fclose(fp);	
+  return bmp;
 }
