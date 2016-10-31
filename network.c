@@ -30,7 +30,7 @@ network *newNetwork(unsigned nblayer, unsigned *layers)
       neurone[j] = 0;
     o[i] = neurone;
   }
-  
+
   float **d = (float **) malloc(sizeof(float *) * (nblayer - 1));
   for (unsigned i = 1; i < nblayer; i++)
   {
@@ -61,7 +61,7 @@ network *newNetwork(unsigned nblayer, unsigned *layers)
   n->delta = d;
   n->weight = w;
   return n;
-} 
+}
 
 /**
  * \brief free all components of a network
@@ -97,11 +97,11 @@ void freeNetwork(network *n)
  */
 network *loadNetwork(char *path)
 {
-  
+
   FILE *file = fopen(path, "r");
-  
+
   //nblayer
-  unsigned nblayer;  
+  unsigned nblayer;
   fread(&nblayer, sizeof(unsigned), 1, file);
 
   //*layers
@@ -113,7 +113,7 @@ network *loadNetwork(char *path)
   //**threshold
   for(unsigned k = 0; k < n->nblayer - 1; k++)
     fread(n->threshold[k], sizeof(float), n->layers[k + 1], file);
-  
+
   //***weight
   for(unsigned k = 0; k < n->nblayer - 1; k++)
     for(unsigned l = 0; l < n->layers[k]; l++)
@@ -135,14 +135,14 @@ void saveNetwork(char *path, network *n)
   FILE *file = fopen(path, "w");
   if (file == NULL)
     errx(1, "error during fopen");
-  
+
   //nblayer
   fwrite(&n->nblayer, sizeof(unsigned), 1, file);
   //fputc('\n', file);
-  
+
   //*layers
   fwrite(n->layers, sizeof(unsigned), n->nblayer, file);
-  
+
   //**threshold
   for(unsigned k = 1; k < n->nblayer; k++)
     fwrite(n->threshold[k - 1], sizeof(float), n->layers[k], file);
@@ -151,6 +151,6 @@ void saveNetwork(char *path, network *n)
   for(unsigned k = 0; k < n->nblayer - 1; k++)
     for(unsigned l = 0; l < n->layers[k]; l++)
       fwrite(n->weight[k][l], sizeof(float), n->layers[k + 1], file);
-  
+
   fclose(file);
 }

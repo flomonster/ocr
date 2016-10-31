@@ -23,7 +23,7 @@ void enQueue(queue *q, void *obj)
 
   if (q->length == 0)
     q->first = elt;
-  else 
+  else
     q->last->next = elt;
   q->last = elt;
   q->length++;
@@ -45,6 +45,6 @@ void *deQueue(queue *q)
     q->length--;
     return obj;
   }
-  else 
+  else
     errx(1, "Can not dequeue : length = 0 !");
 }

@@ -7,11 +7,11 @@
 # pragma pack(push, 1)
 struct s_bitmapFileHeader
 {
-	uint16_t bfType;  
-	uint32_t bfSize;  
-	uint16_t bfReserved1;  
-	uint16_t bfReserved2;  
-	uint32_t bfOffBytes;  
+	uint16_t bfType;
+	uint32_t bfSize;
+	uint16_t bfReserved1;
+	uint16_t bfReserved2;
+	uint32_t bfOffBytes;
 };
 # pragma pack(pop)
 typedef struct s_bitmapFileHeader bitmapFileHeader;
@@ -73,7 +73,7 @@ void freeBitmap(bitmap *img)
 }
 
 /**
- * \brief Draw an image in console 
+ * \brief Draw an image in console
  *
  * \param img the image which will be draw
  */
@@ -88,7 +88,7 @@ void freeBitmap(bitmap *img)
 		if (i % img->width == 0 && i != 0)
       printf(" |\n| ");
     char c = img->content[i].r == 0 ? '#' : ' ';
-    printf("%c", c); 
+    printf("%c", c);
   }
   printf(" |\n+");
   for (unsigned i = 0; i < img->width + 2; i++)
@@ -116,7 +116,7 @@ void binarize(bitmap *img)
 
 /**
  * \brief resize an image in 16x16 pixels
- * 
+ *
  * \pram img the image which will be resize
  */
 void resize(bitmap *img)
@@ -170,15 +170,15 @@ bitmap *loadBmp(char *path)
   bitmapFileHeader fileHeader;
   bitmapInfoHeader infoHeader;
   bitmap *bmp = malloc(sizeof(bitmap));
-	
+
   fread(&fileHeader, sizeof(bitmapFileHeader), 1, fp);
-  
+
   if (fileHeader.bfType != 0x4D42)
   {
     fclose(fp);
     errx(1, "The expected file is not a .bmp");
   }
-  
+
   fread(&infoHeader, sizeof(bitmapInfoHeader), 1, fp);
   fseek(fp, fileHeader.bfOffBytes, SEEK_SET);
 
@@ -201,6 +201,6 @@ bitmap *loadBmp(char *path)
     fseek(fp, padding, SEEK_CUR);
   }
 
-  fclose(fp);	
+  fclose(fp);
   return bmp;
 }

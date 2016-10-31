@@ -5,14 +5,14 @@
 
 struct s_element
 {
-  void *obj; 
+  void *obj;
   struct s_element *next;
 };
 typedef struct s_element element;
 
 struct s_queue
 {
-  int length; 
+  int length;
   element *first;
   element *last;
 };

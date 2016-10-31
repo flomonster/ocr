@@ -23,7 +23,7 @@ float **createSamples(char *path, int *nbSample)
     element *el2 = q1->first;
     for (int j = 0; j < q1->length; j++)
     {
-      queue *q2 = el2->obj; 
+      queue *q2 = el2->obj;
       *nbSample += q2->length;
       el2 = el2->next;
     }
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
     layers[1] = 60;
     layers[2] = 66;
     network *n = newNetwork(3, layers);
-    
+
     printf("Generating the network :\n");
     printf("  - Layer size : %d | %d | %d\n", layers[0], layers[1], layers[2]);
     printf("  - Creation of network.save\n");
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     size_t i = 0;
 
     FILE *fp = fopen(argv[2] ,"r");
-    do 
+    do
     {
       fread(pathImg + i, 1, 1, fp);
       i++;
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
     printf("LEARNING :\n");
     learn(n, inputs, outputs, *nbSample, .2, .075);
     printf("  - Time : %.6f (seconds)\n", (clock() - chrono) / 1000000.0F);
-    
+
     printf("  - Update of network.save\n");
     saveNetwork("network.save", n);
 
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
     i = 0;
     while (q->length > 0)
     {
-      queue *line = deQueue(q);  
+      queue *line = deQueue(q);
       while (line->length > 0)
       {
         queue *word = deQueue(line);

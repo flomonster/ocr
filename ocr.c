@@ -17,17 +17,17 @@ char alphabet[66] = {
 
 /**
  * \brief Sigmoid function
- * 
+ *
  * \param x a real number
  */
-__attribute__((const)) float sigmoid(float x) 
+__attribute__((const)) float sigmoid(float x)
 {
   return 1 / (1 + exp(-x));
 }
 
 /**
  * \brief the activation function of a neural network
- * 
+ *
  * \param n the neural network
  * \param inputs values for the input layer
  */
@@ -67,7 +67,7 @@ void backPropagation(network *n, float *outputs)
       n->delta[i - 1][j] = 0;
       for (unsigned k = 0; k < n->layers[i + 1]; k++)
         n->delta[i - 1][j] += n->weight[i][j][k] * n->delta[i][k];
-      n->delta[i - 1][j] *= n->out[i][j] * (1 - n->out[i][j]); 
+      n->delta[i - 1][j] *= n->out[i][j] * (1 - n->out[i][j]);
     }
 }
 
@@ -154,7 +154,7 @@ char ocr(bitmap *img, network *n)
 
   int best = 0;
   for (unsigned i = 1; i < n->layers[n->nblayer - 1]; i++)
-    if (n->out[n->nblayer - 1][best] < n->out[n->nblayer - 1][i]) 
+    if (n->out[n->nblayer - 1][best] < n->out[n->nblayer - 1][i])
       best = i;
 
   free(input);

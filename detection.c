@@ -8,13 +8,13 @@
  * \brief Put a marker for each line with a letter
  *
  * \param img the full image
- * \param array where marker is put in function of the img 
+ * \param array where marker is put in function of the img
  */
 void putLineMarker(bitmap *img, char *array)
 {
   for(unsigned i = 0; i < img->height; i++)
   {
-    unsigned j = 1; 
+    unsigned j = 1;
     unsigned char mem = img->content[i * img->width].r;
     while (j < img->width && mem == img->content[i * img->width + j].r)
       j++;
@@ -22,19 +22,19 @@ void putLineMarker(bitmap *img, char *array)
   }
 }
 
-/** 
+/**
  * \brief Put a marker for each column with a letter
- *  
+ *
  * \param img one line of the full image
  * \param min X min
  * \param max X max
- * \param array where marker is put in function of the img * 
+ * \param array where marker is put in function of the img *
  */
 void putColumnMarker(bitmap *img, unsigned min, unsigned max, char *array)
 {
   for(unsigned i = 0; i < img->width; i++)
   {
-    unsigned j = min; 
+    unsigned j = min;
     while (j < max &&
         img->content[i].r == img->content[j * img->width + i].r)
       j++;
@@ -48,8 +48,8 @@ void putColumnMarker(bitmap *img, unsigned min, unsigned max, char *array)
  * \param img full img
  * \param X min x
  * \param Y min y
- * \param width the width of the new bitmap 
- * \param height the height of the new bitmap 
+ * \param width the width of the new bitmap
+ * \param height the height of the new bitmap
  * *
  */
 bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
@@ -66,9 +66,9 @@ bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
 }
 
 /**
- * \brief find the length average of letters for one line 
+ * \brief find the length average of letters for one line
  *
- * \param columnMarker array where there are marker for each pixel 
+ * \param columnMarker array where there are marker for each pixel
  * \param width is the width of the columnMarker
  */
 float letterLengthAverage(char *columnMarker, unsigned width)
@@ -93,7 +93,7 @@ float letterLengthAverage(char *columnMarker, unsigned width)
   return sumWidthLetter / nbLetter;
 }
 
-/* 
+/*
  * \brief Create a queue with all letter in a bitmap
  *
  * \param img the full image
@@ -113,7 +113,7 @@ queue *segmentation(bitmap *img)
   unsigned Y, X;
   float letterAverage;
 
-  unsigned i = 0; 
+  unsigned i = 0;
   while (i < img->height)
   {
     if (i < img->height && lineMarker[i] == 1)
@@ -121,12 +121,12 @@ queue *segmentation(bitmap *img)
       Y = i;
       while (i < img->height && lineMarker[i] == 1)
         i++;
-      
+
       queue *line = newQueue();
       putColumnMarker(bmp, Y, i, columnMarker);
       letterAverage = letterLengthAverage(columnMarker, img->width);
       queue *word = newQueue();
-      
+
       unsigned j = 0;
       while (j < img->width)
       {
@@ -139,7 +139,7 @@ queue *segmentation(bitmap *img)
           bitmap *bmpResult = cutBmp(img, X, Y, j - X, i - Y);
           enQueue(word, bmpResult);
         }
-        else 
+        else
         {
           X = j;
           while (j < img->width && columnMarker[j] == 0)
