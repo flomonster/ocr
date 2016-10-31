@@ -144,8 +144,7 @@ queue *segmentation(bitmap *img)
           X = j;
           while (j < img->width && columnMarker[j] == 0)
             j++;
-
-          if ((float)j - X > letterAverage / 2 && j < img->width &&
+          if ((float)j - X > letterAverage / 1.5 && j < img->width &&
               word->length )
           {
             enQueue(line, word);
