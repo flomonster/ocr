@@ -6,6 +6,9 @@
 *.d
 *.save
 
+
+REMEMBER
+
 # Precompiled Headers
 *.gch
 *.pch
