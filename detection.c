@@ -2,6 +2,7 @@
 # include <stdlib.h>
 # include <err.h>
 # include "bitmap.h"
+# include "queue.h"
 # include "detection.h"
 
 /**
@@ -98,8 +99,10 @@ float letterLengthAverage(char *columnMarker, unsigned width)
  *
  * \param img the full image
  */
-queue *segmentation(bitmap *img)
+queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
 {
+  *nbCharacter = 0;
+  *nbLetter = 0;
   color content[img->height * img->width];
   for (unsigned c = 0; c < img->height * img->width; c++)
     content[c] = img->content[c];
@@ -138,6 +141,7 @@ queue *segmentation(bitmap *img)
 
           bitmap *bmpResult = cutBmp(img, X, Y, j - X, i - Y);
           enQueue(word, bmpResult);
+          (*nbCharacter)++;
         }
         else
         {
@@ -149,14 +153,17 @@ queue *segmentation(bitmap *img)
           {
             enQueue(line, word);
             word = newQueue();
+            (*nbLetter)++;
           }
         }
       }
       enQueue(line, word);
       enQueue(q, line);
+      *nbLetter += 2;
     }
     i++;
   }
+  *nbLetter += *nbCharacter;
   free(bmp);
   return q;
 }

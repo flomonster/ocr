@@ -6,14 +6,9 @@
 # include "network.h"
 # include "ocr.h"
 
-char alphabet[66] = {
-'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',', '?',
-'!'
-};
+char characters[95] = 
+"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQR"
+"STUVWXYZ0123456789.,?!_-&\"#{([|\'\\@)]°}+=$%*;/:<>";
 
 /**
  * \brief Sigmoid function
@@ -112,33 +107,6 @@ float evaluate(network *n, float **samples, float **results, unsigned nbSample)
 }
 
 /**
- * \brief entrain a neural network with samples
- *
- * \param n the neural network
- * \param samples the inputs of samples
- * \param results the outputs of samples
- * \param nbSample the number of samples
- */
-void learn(network *n, float **samples, float **results, unsigned nbSample,
-    float speed, float goal)
-{
-  float error = 1;
-  while (error > goal)
-  {
-    printf("  - STATUS : %d%%\n", (int) ((1 - error) / (1 - goal) * 100));
-    for (int i = 0; i < 1000; i++)
-      for (unsigned j = 0; j < nbSample; j++)
-      {
-        feedForward(n, samples[j]);
-        backPropagation(n, results[j]);
-        update(n, speed);
-      }
-    error = evaluate(n, samples, results, nbSample);
-  }
-  printf("  - STATUS : 100%%\n");
-}
-
-/**
  * \brief optical character recognition
  *
  * \param img a picture of a character (16x16)
@@ -168,8 +136,8 @@ char ocr(bitmap *img, network *n)
  */
 int getCharIndex(char c)
 {
-  for (size_t i = 0; i < sizeof(alphabet); i++)
-    if (alphabet[i] == c)
+  for (size_t i = 0; i < sizeof(characters); i++)
+    if (characters[i] == c)
       return i;
   errx(1, "The character is not valid !");
 }
@@ -181,5 +149,5 @@ int getCharIndex(char c)
  */
 char getCharFromIndex(int i)
 {
-  return alphabet[i];
+  return characters[i];
 }

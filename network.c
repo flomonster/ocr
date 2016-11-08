@@ -154,3 +154,27 @@ void saveNetwork(char *path, network *n)
 
   fclose(file);
 }
+
+/**
+ * \brief generate a network of three layer
+ *
+ * \param c1 the number of neurone for the first layer
+ * \param c1 the number of neurone for the second layer
+ * \param c1 the number of neurone for the third layer
+ */
+void generateNetwork(unsigned l1, unsigned l2, unsigned l3)
+{
+  unsigned *layers = malloc(sizeof(unsigned) * 3);
+  layers[0] = l1;
+  layers[1] = l2;
+  layers[2] = l3;
+  network *n = newNetwork(3, layers);
+
+  printf("Generating the network :\n");
+  printf("  - Layer size : %d | %d | %d\n", layers[0], layers[1], layers[2]);
+  printf("  - Creation of network.save\n");
+  saveNetwork("network.save", n);
+  printf("DONE\n");
+
+  freeNetwork(n);
+}
