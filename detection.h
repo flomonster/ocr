@@ -13,7 +13,7 @@ bitmap *cutBmp(bitmap *, unsigned, unsigned, unsigned, unsigned);
 
 float letterLengthAverage(char *, unsigned);
 
-queue *segmentation(bitmap *);
+queue *segmentation(bitmap *, size_t *, size_t *);
 
 # endif
 

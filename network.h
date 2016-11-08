@@ -23,4 +23,5 @@ network *loadNetwork(char *path);
 
 void saveNetwork(char *path, network *n);
 
+void generateNetwork(unsigned, unsigned, unsigned);
 # endif
