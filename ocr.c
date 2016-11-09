@@ -93,17 +93,18 @@ void update(network *n, float speed)
  * \param results expected outputs of samples
  * \param nbSample the number of samples
  */
-float evaluate(network *n, float **samples, float **results, unsigned nbSample)
+float evaluate(network *n, float **samples, float **results, size_t sizeBatch,
+    int batch[])
 {
   float error = 0;
   unsigned last = n->nblayer - 1;
-  for (unsigned i = 0; i < nbSample; i++)
+  for (size_t i = 0; i < sizeBatch; i++)
   {
-    feedForward(n, samples[i]);
+    feedForward(n, samples[batch[i]]);
     for (unsigned j = 0; j < n->layers[last]; j++)
-      error += fabsf(n->out[last][j] - results[i][j]);
+      error += fabsf(n->out[last][j] - results[batch[i]][j]);
   }
-  return error / nbSample;
+  return error / sizeBatch;
 }
 
 /**

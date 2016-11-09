@@ -18,23 +18,20 @@
  * \param results the outputs of samples
  * \param nbSample the number of samples
  */
-void learn(network *n, float **samples, float **results, unsigned nbSample,
-    float speed, float goal)
+float learn(network *n, float **samples, float **results, unsigned nbSample,
+    float speed, size_t sizeBatch)
 {
-  float error = 1;
-  while (error > goal)
-  {
-    printf("  - STATUS : %d%%\n", (int) ((1 - error) / (1 - goal) * 100));
-    for (int i = 0; i < 1000; i++)
-      for (unsigned j = 0; j < nbSample; j++)
-      {
-        feedForward(n, samples[j]);
-        backPropagation(n, results[j]);
-        update(n, speed);
-      }
-    error = evaluate(n, samples, results, nbSample);
-  }
-  printf("  - STATUS : 100%%\n");
+  int batch[sizeBatch];
+  for (size_t i = 0; i < sizeBatch; i++)
+    batch[i] = rand() % nbSample;
+  for (int i = 0; i < 5000; i++)
+    for (size_t j = 0; j < sizeBatch; j++)
+    {
+      feedForward(n, samples[batch[j]]);
+      backPropagation(n, results[batch[j]]);
+      update(n, speed);
+    }
+  return evaluate(n, samples, results, sizeBatch, batch);
 }
 
 /**
@@ -97,12 +94,19 @@ void learning(char *learnFiles[], size_t nbFile)
   float **outputs = createResults(text, length);
 
   clock_t chrono = clock();
+  float error = 1;
+  float goal = .075;
   printf("LEARNING :\n");
-  learn(n, inputs, outputs, length, .2, .075);
+  printf("  - STATUS : %d%%\n", (int) ((1 - error) / (1 - goal) * 100));
+  while (error > goal)
+  {
+    error = learn(n, inputs, outputs, length, .2, 50);
+    error = error < 0 ? 0 : error;
+    printf("  - STATUS : %d%% ", (int) ((1 - error) / (1 - goal) * 100));
+    printf("(Update of network.save)\n");
+    saveNetwork("network.save", n);
+  }
   printf("  - Time : %.6f (seconds)\n", (clock() - chrono) / 1000000.0F);
-
-  printf("  - Update of network.save\n");
-  saveNetwork("network.save", n);
 
   printf("DONE\n");
 
@@ -141,6 +145,7 @@ int createSamples(queue *text, float **samples)
     }
     free(line);
   }
+  free(text);
   return samples - origin;
 }
 
