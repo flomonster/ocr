@@ -31,6 +31,8 @@ float learn(network *n, float **samples, float **results, unsigned nbSample,
       backPropagation(n, results[batch[j]]);
       update(n, speed);
     }
+  for (size_t i = 0; i < sizeBatch; i++)
+    batch[i] = rand() % nbSample;
   return evaluate(n, samples, results, sizeBatch, batch);
 }
 
@@ -83,10 +85,8 @@ void learning(char *learnFiles[], size_t nbFile)
       fread(text + i, 1, 1, fp);
 
     while (fread(text + i, 1, 1, fp))
-    {
       if (text[i] != '\n' && text[i] != ' ')
         i++;
-    }
     fclose(fp);
   }
   text[length] = 0;
