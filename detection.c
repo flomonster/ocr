@@ -167,3 +167,94 @@ queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
   free(bmp);
   return q;
 }
+
+void widthTravel(bitmap *src, bitmap *dst)
+{
+  int cpt, pos;
+  for (unsigned i = 0; i < src->height; i++)
+    for (unsigned j = 0; j < src->width; j++)
+    {
+      if ((src->content)[i * src->width + j].r == 0)
+        (dst->content)[i * dst->width + j] = newColor(0, 0, 0);
+      else
+      {
+      cpt = 0;
+      pos = j - 1;
+      while (pos >= 0 && (src->content)[i * src->width + pos].r == 1)
+      {
+        cpt++;
+        pos--;
+      }
+      pos = j + 1;
+      while ((unsigned)pos < src->width && 
+            (src->content)[i * src->width + pos].r == 1)
+      {
+        cpt++;
+        pos++;
+      }
+      if (cpt <= 4) /*Remplacer le 4 par la bonne valeur*/
+        (dst->content)[i * dst->width + j] = newColor(0, 0, 0);
+      else 
+        (dst->content)[i * dst->width + j] = newColor(1, 1, 1);
+      }
+    }
+}
+
+void heightTravel(bitmap *src, bitmap *dst)
+{
+  int cpt, pos;
+  for (unsigned i = 0; i < src->width; i++)
+    for (unsigned j = 0; i < src->height; j++)
+    {
+      if ((src->content)[j * src->width + i].r == 0)
+        (dst->content)[j * dst->width + i] = newColor(0, 0, 0);
+      else 
+      {
+        cpt = 0;
+        pos = j - 1;
+        while (pos >= 0 && (src->content)[j * src->width + i].r == 1)
+        {
+          cpt++;
+          pos--;
+        }
+        pos = j + 1;
+        while ((unsigned)pos < src->height && 
+           (src->content)[j * src->width + i].r == 1)
+        {
+          cpt++;
+          pos++;
+        }
+        if (cpt <= 4) /*Remplacer le 4 par la bonne valeur*/
+          (dst->content)[j * src->width + i] = newColor(0, 0, 0);
+        else 
+           (dst->content)[j * src->width + i] = newColor(1, 1, 1);
+      }
+    }
+}
+
+void merge(bitmap *src1, bitmap *src2, bitmap *dst)
+{
+  for (unsigned i = 0; i < src1->height; i++)
+    for (unsigned j = 0; j < src1->width; j++)
+    {
+      if ((src1->content)[i * src1->width + j].r == 0 && 
+          (src2->content)[i * src2->width + j].r == 0)
+        (dst->content)[i * dst->width + j] = newColor(0, 0, 0);
+      else 
+        (dst->content)[i * dst->width + j] = newColor(1, 1, 1);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
