@@ -9,7 +9,7 @@ void backPropagation(network *, float *);
 
 void update(network *, float);
 
-float evaluate(network *, float **, float **, size_t, int[]);
+float evaluate(network *, float **, float **, size_t);
 
 char ocr(bitmap *, network *);
 
