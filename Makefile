@@ -3,9 +3,9 @@ CC=gcc
 CPPFLAGS= -MMD
 CFLAGS= -Wall -Wextra -std=c99 -O3 `pkg-config --cflags --libs gtk+-3.0`
 LDFLAGS=
-LDLIBS= -lm
+LDLIBS= `pkg-config --cflags --libs gtk+-3.0` -lm
 
-SRC = main.c ocr.c network.c graphical.c detection.c bitmap.c queue.c learning.c
+SRC = main.c ocr.c network.c detection.c bitmap.c queue.c learning.c graphical.c
 OBJ = ${SRC:.c=.o}
 DEP = ${SRC:.c=.d}
 
