@@ -62,14 +62,13 @@ float learn(network *n, float **samples, float **results, unsigned nbSample,
 {
   shuffleSample(samples, results, nbSample);
   sizeBatch = sizeBatch < nbSample ? sizeBatch : nbSample;
-  for (int i = 0; i < 4000; i++)
+  for (int i = 0; i < 2000; i++)
     for (size_t j = 0; j < sizeBatch; j++)
     {
       feedForward(n, samples[j]);
       backPropagation(n, results[j]);
       update(n, speed);
     }
-  //randomize(n, .00275);
   return evaluate(n, samples, results, nbSample);
 }
 
@@ -126,8 +125,7 @@ void learning(char *learnFiles[], size_t nbFile)
         i++;
     fclose(fp);
   }
-  text[length] = 0;
-
+  text[i] = 0;
   float **outputs = createResults(text, length);
 
   clock_t chrono = clock();
@@ -180,7 +178,7 @@ int createSamples(queue *text, float **samples)
         binarize(letter);
         *samples = malloc(sizeof(float) * 256);
         for (int i = 0; i < 256; i++)
-          (*samples)[i] = letter->content[i].r;
+          (*samples)[i] = letter->content[i].r == 255 ? 1 : 0;
         samples++;
       freeBitmap(letter);
       }
