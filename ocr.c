@@ -31,6 +31,7 @@ void softmax(unsigned k, float *z)
   float sum = 0;
   for (unsigned i = 0; i < k; i++)
     sum += exp(z[i]); 
+  sum = sum == 0 ? 1 : sum;
   for (unsigned i = 0; i < k; i++)
     z[i] = exp(z[i]) / sum;
 }
