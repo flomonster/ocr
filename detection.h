@@ -7,16 +7,16 @@
 
 struct s_histogram
 {
-  unsigned BC; 
-  unsigned xMin;
+  unsigned x;
+  unsigned y;
   unsigned deltaX;
-  unsigned yMin;
   unsigned deltaY;
   unsigned DC;
-  unsigned TC; 
-  unsigned Class;
+  unsigned TC;
 };
 typedef struct s_histogram histogram;
+
+bitmap *binerizeCopy(bitmap *);
 
 void putLineMarker(bitmap *, char *);
 
@@ -26,13 +26,25 @@ bitmap *cutBmp(bitmap *, unsigned, unsigned, unsigned, unsigned);
 
 float letterLengthAverage(char *, unsigned);
 
+float lineHeigthAverage(char *, unsigned);
+
 queue *segmentation(bitmap *, size_t *, size_t *);
 
-void widthTravel(bitmap *, bitmap *);
+bitmap *widthTravel(bitmap *);
 
-void heigthTravel(bitmap *, bitmap *);
+bitmap *heightTravel(bitmap *);
 
-void merge(bitmap *, bitmap *, bitmap *);
+bitmap *merge(bitmap *, bitmap *);
+
+char checkClass(histogram *, float *);
+
+void makeHistogram(bitmap *, bitmap *, unsigned, unsigned, queue *);
+
+queue *textToHisto(bitmap *, bitmap *, float *);
+
+bitmap *histoToImage(bitmap *, queue *, float *);
+
+bitmap *rlsa(bitmap *);
 
 # endif
 
