@@ -204,3 +204,65 @@ bitmap *loadBmp(char *path)
   fclose(fp);
   return bmp;
 }
+
+/*
+ * \brief Equalize the histogram of the bitmap to raise the contrast
+ *
+ * \param bitmap *img : the bitmap
+ *
+*/
+void autoContrast(bitmap *img)
+{
+  unsigned *histoR = malloc(256 * sizeof(unsigned));
+  unsigned *histoG = malloc(256 * sizeof(unsigned));
+  unsigned *histoB = malloc(256 * sizeof(unsigned));
+
+  unsigned *histoRC = malloc(256 * sizeof(unsigned));
+  unsigned *histoGC = malloc(256 * sizeof(unsigned));
+  unsigned *histoBC = malloc(256 * sizeof(unsigned));
+
+  unsigned cR = 0;
+  unsigned cG = 0;
+  unsigned cB = 0;
+
+  unsigned j;  
+  unsigned n = img->width * img->height;
+  unsigned i;
+
+  for (j = 0; j < 256; j++)
+  {
+    histoR[j] = 0;
+    histoG[j] = 0;
+    histoB[j] = 0;
+  }
+  for (i = 0; i < n; i++)
+  {
+    histoR[img->content[i].r]++;
+    histoG[img->content[i].g]++;
+    histoB[img->content[i].b]++;
+  }
+ 
+  for (j = 0; j < 256; j++) 
+  {
+    cR += histoR[j];
+    histoRC[j] = cR;
+    cG += histoG[j];
+    histoGC[j] = cG;
+    cB += histoB[j];
+    histoBC[j] = cB;
+  }
+  
+  for (i = 0; i < n; i++)
+  {
+    img->content[i].r = 255 * i * histoRC[img->content[i].r] / n;
+    img->content[i].g = 255 * i * histoGC[img->content[i].g] / n;
+    img->content[i].b = 255 * i * histoBC[img->content[i].b] / n;
+  }
+
+  free(histoR);
+  free(histoG);
+  free(histoB);
+  free(histoRC);
+  free(histoGC);
+  free(histoBC);
+}
