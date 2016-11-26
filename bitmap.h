@@ -43,4 +43,6 @@ void resize(bitmap *img);
 
 bitmap *loadBmp(char *path);
 
+void autoContrast(bitmap *img);
+
 # endif
