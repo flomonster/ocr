@@ -9,28 +9,25 @@
 #include "network.h"
 #include "main_functions.h"
 
-struct tuple{
-GtkWidget *parent_window;
-char *data;};
+typedef struct {
+	GtkWidget *pWindow;
+	GtkWidget *image;
+	GtkWidget *text;
+}Zone;
 /* Save the output (data) in file located at path */
-void save_to_file(char *path, char *data);
+void saveFile(GtkWidget *widget, gpointer data);
 
-/* Launches the learning on the file located at path */
-void launch_leaning(char *path);
-
-/* Choose the file and then launch above function */
-void learning(GtkWidget *parent_window);
 
 /* Gets the path of a chosen file */
-void get_path(struct tuple *tuple);
+void cbOpen(GtkWidget *widget, gpointer data);
 
 /* Build the interface and calls the functions whenever necessary */
 int start(int argc, char **argv);
 
 /* Launch a leave dialog confirmation */
-void leave_dialog(GtkWidget *data);
+void leaveDialog(GtkWidget *data);
 
 /* Saves the file whereever the user has chosen */
-void save_file(GtkWidget *parent_window, char *data);
+void saveFile(GtkWidget *parent_window, char *data);
 
 # endif
