@@ -21,54 +21,7 @@ typedef struct
 }Zone;
 
 
-void launch_learning(char *path){
-    /*
-		if (argc != 3)
-      return 0;
-		*/
-    char pathImg[100];
-    char text[1000];
-    size_t i = 0;
-
-    FILE *fp = fopen(path ,"r");
-    do
-    {
-      fread(pathImg + i, 1, 1, fp);
-      i++;
-    } while (pathImg[i-1] != '\n');
-    pathImg[i-1] = 0;
-    i = 0;
-
-    do
-    {
-      fread(text + i, 1, 1, fp);
-      i++;
-    } while (text[i-1] != '\0');
-
-    fclose(fp);
-
-    network *n = loadNetwork("network.save");
-    int *nbSample = malloc(sizeof(int));
-    float **inputs = createSamples(pathImg, nbSample);
-    int nbOutput = n->layers[n->nblayer - 1];
-    float **outputs = createResults(text, *nbSample, nbOutput);
-    clock_t chrono = clock();
-    printf("LEARNING :\n");
-    learn(n, inputs, outputs, *nbSample, .2, .075);
-    printf("  - Time : %.6f (seconds)\n", (clock() - chrono) / 1000000.0F);
-		//HERE WE CAN SEE TO DO A LOADING BAR
-    printf("  - Update of network.save\n");
-    saveNetwork("network.save", n);
-
-    printf("DONE\n");
-
-    freeSamples(inputs, *nbSample);
-    freeSamples(outputs, *nbSample);
-    free(nbSample);
-    freeNetwork(n);
-}
-
-void save_file(GtkWidget *window, gpointer data){
+void saveFile(GtkWidget *window, gpointer data){
 	Zone *zone = (Zone*)data;
   GtkWidget *topLevel = NULL;
   topLevel = gtk_widget_get_toplevel(zone->text);
@@ -101,7 +54,7 @@ void save_file(GtkWidget *window, gpointer data){
       fileName = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
       FILE *file = NULL;
       file = fopen(fileName, "w");
-      if(file)
+      if (file)
       { 
   			gchar *chars = NULL;
 			  GtkTextBuffer *textBuffer = NULL;
@@ -115,7 +68,7 @@ void save_file(GtkWidget *window, gpointer data){
 			  g_free(chars);
       }
       else
-			  printf("Impossible to save file\n");
+			  warnx("Impossible to save file");
       break;
     }
     default:
@@ -125,7 +78,7 @@ void save_file(GtkWidget *window, gpointer data){
 	(void)window;
 }
 
-void cb_open(GtkWidget *widget, gpointer data)
+void cbOpen(GtkWidget *widget, gpointer data)
 {
   Zone *zone = (Zone*)data;
   GtkWidget *topLevel = NULL;
@@ -143,26 +96,21 @@ void cb_open(GtkWidget *widget, gpointer data)
   gtk_file_filter_set_name(filter, "Image File");
   gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
 
-  switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+  gint res = gtk_dialog_run(GTK_DIALOG(dialog));
+  if (res ==  GTK_RESPONSE_ACCEPT)
   {
-    case GTK_RESPONSE_ACCEPT:
-    {
-      gchar *fileName = NULL;
-      fileName = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-      gtk_image_set_from_file(GTK_IMAGE(zone->image), fileName);
-      g_free(fileName);
-      break;
-    }
-    default:
-      break;
+    gchar *fileName = NULL;
+    fileName = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+    gtk_image_set_from_file(GTK_IMAGE(zone->image), fileName);
+    g_free(fileName);
   }
-  gtk_widget_destroy(dialog);
+	gtk_widget_destroy(dialog);
 	(void)widget;
 }
 
 /* Create a dialog that make the user confirm if he really 
 wants to quit the program*/
-void leave_dialog(GtkWidget *widget, gpointer data)
+void leaveDialog(GtkWidget *widget, gpointer data)
 {
 	Zone *zone = (Zone*)data;
   GtkWidget *pQuestion;
@@ -196,7 +144,7 @@ int start(int argc, char **argv)
   gtk_init(&argc, &argv);
 	GtkWidget *mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   g_signal_connect(G_OBJECT(mainWindow), "destroy",
-														  G_CALLBACK(leave_dialog), NULL);
+														  G_CALLBACK(leaveDialog), NULL);
 
   gtk_window_maximize(GTK_WINDOW(mainWindow));
   gtk_window_set_title(GTK_WINDOW(mainWindow), "Group's Name");
@@ -220,11 +168,11 @@ int start(int argc, char **argv)
   /*Menu items*/
   GtkWidget *menuItem = NULL;
   menuItem = gtk_menu_item_new_with_label("Open");
-  g_signal_connect(G_OBJECT(menuItem), "activate", G_CALLBACK(cb_open), zone);
+  g_signal_connect(G_OBJECT(menuItem), "activate", G_CALLBACK(cbOpen), zone);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuItem);
 
   menuItem = gtk_menu_item_new_with_label("Save");
-  g_signal_connect(G_OBJECT(menuItem), "activate", G_CALLBACK(save_file), zone);
+  g_signal_connect(G_OBJECT(menuItem), "activate", G_CALLBACK(saveFile), zone);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuItem);
 
   menuItem = gtk_separator_menu_item_new();
@@ -232,7 +180,7 @@ int start(int argc, char **argv)
 
   menuItem = gtk_menu_item_new_with_label("Quit");
   g_signal_connect(G_OBJECT(menuItem), "activate", 
-												G_CALLBACK(leave_dialog), NULL);
+												G_CALLBACK(leaveDialog), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuItem);
   /*Submenu*/
   menuItem = gtk_menu_item_new_with_label("File");
@@ -252,7 +200,7 @@ int start(int argc, char **argv)
 
   menuItem = gtk_menu_item_new_with_label("Learn");
   g_signal_connect(G_OBJECT(menuItem), "activate",
-       G_CALLBACK(launch_learning), zone);
+       G_CALLBACK(launchLearning), zone);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuItem);
 
 
@@ -272,7 +220,7 @@ int start(int argc, char **argv)
 
   menuItem = gtk_menu_item_new_with_label("About");
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuItem);
-  /*Submenu*/
+  /*S u*/
   menuItem = gtk_menu_item_new_with_label("?");
   /*Link menu items*/
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuItem), menu);
@@ -286,16 +234,16 @@ int start(int argc, char **argv)
   gtk_box_pack_start(GTK_BOX(mainBox), toolBar, FALSE, FALSE, 0);
 	
 	GtkButton *op = GTK_BUTTON(gtk_button_new_with_mnemonic("_Open"));
-	g_signal_connect(op, "clicked", G_CALLBACK(cb_open), zone);
+	g_signal_connect(op, "clicked", G_CALLBACK(cbOpen), zone);
   gtk_toolbar_insert(GTK_TOOLBAR(toolBar), GTK_TOOL_ITEM(op), -1);
 	GtkButton *sf = GTK_BUTTON(gtk_button_new_with_mnemonic("_Save"));
-  g_signal_connect(op, "clicked", G_CALLBACK(cb_open), zone);
+  g_signal_connect(op, "clicked", G_CALLBACK(cbOpen), zone);
   gtk_toolbar_insert(GTK_TOOLBAR(toolBar), GTK_TOOL_ITEM(sf), -1);
 	GtkButton *ex = GTK_BUTTON(gtk_button_new_with_mnemonic("_Execute"));
-  g_signal_connect(op, "clicked", G_CALLBACK(cb_open), zone);
+  g_signal_connect(op, "clicked", G_CALLBACK(cbOpen), zone);
   gtk_toolbar_insert(GTK_TOOLBAR(toolBar), GTK_TOOL_ITEM(ex), -1);
 	GtkButton *qu = GTK_BUTTON(gtk_button_new_with_mnemonic("_Quit"));
-  g_signal_connect(op, "clicked", G_CALLBACK(cb_open), zone);
+  g_signal_connect(op, "clicked", G_CALLBACK(cbOpen), zone);
   gtk_toolbar_insert(GTK_TOOLBAR(toolBar), GTK_TOOL_ITEM(qu), -1);
   gtk_toolbar_set_style(GTK_TOOLBAR(toolBar), GTK_TOOLBAR_ICONS);
 	
@@ -327,54 +275,6 @@ int start(int argc, char **argv)
   gtk_box_pack_end(GTK_BOX(mainBox), mainZone, TRUE, TRUE, 0);
 
 	gtk_widget_show_all(mainWindow);
-	/* Generate and configure the window *
-  pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_default_size(GTK_WINDOW(pWindow), 320, 200);
-  gtk_window_set_title(GTK_WINDOW(pWindow), "OCR Project");
-  g_signal_connect(G_OBJECT(pWindow), "destroy", 
-									 G_CALLBACK(gtk_main_quit), NULL);
- 
-  * Creation et insertion de la table 3 lignes 2 colonnes *
-  pGrid = gtk_grid_new();
-	for(int i = 0; i < 50; i++)
-	{
-		gtk_grid_insert_row(GTK_GRID(pGrid), 0);
-		gtk_grid_insert_column(GTK_GRID(pGrid), 0);
-	}
-	for(int i = 0; i < 50; i++)
-  { 
-    gtk_grid_insert_row(GTK_GRID(pGrid), 0);
-  }
-  gtk_container_add(GTK_CONTAINER(pWindow), GTK_WIDGET(pGrid));
-	gtk_grid_set_row_spacing (GTK_GRID(pGrid), 10); 
-  gtk_grid_set_column_spacing (GTK_GRID(pGrid), 100);
-  * Create buttons *
-  pButton[0]= gtk_button_new_with_mnemonic("_Quit");
-  pButton[1]= gtk_button_new_with_mnemonic("_Open a file");
-  pButton[2]= gtk_button_new_with_mnemonic("_Launch Program");
-	pButton[3]= gtk_button_new_with_mnemonic("_Learning");
-	
- 
-  * Insert buttons *
-  gtk_grid_attach(GTK_GRID(pGrid), pButton[0],
-      						560, 0, 3, 10);
-  gtk_grid_attach(GTK_GRID(pGrid), pButton[1],
-      						0, 0, 4, 10);
-  gtk_grid_attach(GTK_GRID(pGrid), pButton[2],
-      						280, 0, 4, 10);
-	gtk_grid_attach(GTK_GRID(pGrid), pButton[3],
-                  300, 0, 4, 10);
-
-	* Show buttons *
-  gtk_widget_show_all(pWindow);
-  * Associate a function to each button *
-	g_signal_connect(G_OBJECT(pButton[0]), "clicked", 
-									 G_CALLBACK(leave_dialog), zone->pWindow); 
-	g_signal_connect(G_OBJECT(pButton[1]), "clicked", 
-									 G_CALLBACK(cb_open), zone);
-	*g_signal_connect(G_OBJECT(pButton[2]), "clicked", 
-                   G_CALLBACK(REMPLACER PAR LA FONCTION QUI LANCE LE PROGRAMME),
-																													NULL);*/
 	//g_signal_connect(G_OBJECT(pButton[3]), "clicked",
     //               G_CALLBACK(learning), zone);
 	gtk_main();
