@@ -7,7 +7,6 @@
 #include "detection.h"
 #include "queue.h"
 #include "network.h"
-#include "main_functions.h"
 
 typedef struct {
 	GtkWidget *pWindow;
@@ -27,7 +26,5 @@ int start(int argc, char **argv);
 /* Launch a leave dialog confirmation */
 void leaveDialog(GtkWidget *data);
 
-/* Saves the file whereever the user has chosen */
-void saveFile(GtkWidget *parent_window, char *data);
 
 # endif

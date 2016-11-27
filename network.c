@@ -163,12 +163,12 @@ void saveNetwork(char *path, network *n)
  * \param c1 the number of neurone for the second layer
  * \param c1 the number of neurone for the third layer
  */
-void generateNetwork(unsigned l1, unsigned l2, unsigned l3)
+void generateNetwork()
 {
   unsigned *layers = malloc(sizeof(unsigned) * 3);
-  layers[0] = l1;
-  layers[1] = l2;
-  layers[2] = l3;
+  layers[0] = 256;
+  layers[1] = 80;
+  layers[2] = 95;
   network *n = newNetwork(3, layers);
 
   printf("Generating the network :\n");

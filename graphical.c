@@ -1,14 +1,14 @@
-#include <stdio.h>
-#include <stdlib.h>
+# include <stdio.h>
+# include <stdlib.h>
 # include <err.h>
 # include <time.h>
-#include <gtk/gtk.h>
-#include "ocr.h"
-#include "bitmap.h"
-#include "detection.h"
-#include "queue.h"
-#include "network.h"
-#include "main_functions.h"
+# include <gtk/gtk.h>
+# include "ocr.h"
+# include "bitmap.h"
+# include "detection.h"
+# include "queue.h"
+# include "network.h"
+# include "learning.h"
 
 /* Create a dialog that allows the user to choose a file to open.
 Once the file is open, launch the ocr algorithm on it */
@@ -18,8 +18,78 @@ typedef struct
   GtkWidget *image;
   GtkWidget *text;
   GtkWidget *pWindow;
+	char *path;
 }Zone;
 
+char *ascii_to_utf8(unsigned char c)
+{
+	unsigned char *out;
+	
+	if(c < 128)
+	{
+		out = (char *)calloc(2, sizeof(char));
+		out[0] = c;
+		out[1] = '\0';
+	}
+	else
+	{
+		out = (char *)calloc(3, sizeof(char));
+		out[1] = (c >> 6) | 0xC0;
+		out[0] = (c & 0x3F) | 0x80;
+		out[2] = '\0';
+	}
+	
+	return out;
+}
+
+void process(GtkWidget *window, gpointer data){
+	network *n = loadNetwork("network.save");
+	Zone *zone = (Zone *)data;
+	printf("%s", zone->path);
+  bitmap *img = loadBmp(zone->path);
+	//draw(img);
+	size_t *length = malloc(sizeof(size_t));
+	size_t *useless = malloc(sizeof(size_t));
+	queue *q = segmentation(img, useless, length);
+	int i = 0;
+	char txt[*length + 1];
+	txt[*length] = 0;
+	while (q->length > 0)
+	{
+		queue *line = deQueue(q);
+		while (line->length > 0)
+		{
+			queue *word = deQueue(line);
+			while (word->length > 0)
+			{
+				bitmap *letter = deQueue(word);
+				resize(letter);
+				//autoContrast(letter);
+				binarize(letter);
+				draw(letter);
+				txt[i] = ocr(letter, n);
+				freeBitmap(letter);
+				i++;
+			}
+			free(word);
+			txt[i] = ' ';
+			i++;
+		}
+		free(line);
+		txt[i] = '\n';
+		i++;
+    }
+		GError *error = NULL;
+	  g_convert(txt, i, "UTF-8", "ANSI X3.4:1986",  NULL, NULL, &error)	;
+		GtkTextBuffer *textBuffer = NULL;
+		textBuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(zone->text));
+		gtk_text_buffer_set_text(textBuffer, txt, i);
+		free(useless);
+    free(length);
+    free(q);
+    freeBitmap(img);
+    freeNetwork(n);
+}
 
 void saveFile(GtkWidget *window, gpointer data){
 	Zone *zone = (Zone*)data;
@@ -78,6 +148,31 @@ void saveFile(GtkWidget *window, gpointer data){
 	(void)window;
 }
 
+void fileChoose(GtkWidget *widget, gpointer data)
+{
+  Zone *zone = (Zone*)data;
+  GtkWidget *dialog = NULL;
+  gchar *fileName = NULL;
+  GtkWidget *topLevel = NULL;
+  topLevel = gtk_widget_get_toplevel(zone->image);
+  dialog = gtk_file_chooser_dialog_new("Open file", GTK_WINDOW(topLevel),
+               GTK_FILE_CHOOSER_ACTION_OPEN,
+               "_Cancel", GTK_RESPONSE_CANCEL,
+               "_Open", GTK_RESPONSE_ACCEPT,
+               NULL);
+
+  gint res = gtk_dialog_run(GTK_DIALOG(dialog));
+  if (res ==  GTK_RESPONSE_ACCEPT)
+  {
+    fileName = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+  }
+	gtk_widget_destroy(dialog);
+	printf("Filename : %s\n", fileName);
+	char *listfiles[] = {fileName};
+	learning(listfiles, 1);
+	(void)widget;
+  zone->path = fileName;
+}
 void cbOpen(GtkWidget *widget, gpointer data)
 {
   Zone *zone = (Zone*)data;
@@ -102,7 +197,7 @@ void cbOpen(GtkWidget *widget, gpointer data)
     gchar *fileName = NULL;
     fileName = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
     gtk_image_set_from_file(GTK_IMAGE(zone->image), fileName);
-    g_free(fileName);
+		zone->path = fileName;
   }
 	gtk_widget_destroy(dialog);
 	(void)widget;
@@ -170,6 +265,16 @@ int start(int argc, char **argv)
   menuItem = gtk_menu_item_new_with_label("Open");
   g_signal_connect(G_OBJECT(menuItem), "activate", G_CALLBACK(cbOpen), zone);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuItem);
+	
+  menuItem = gtk_menu_item_new_with_label("Generate network");
+  g_signal_connect(G_OBJECT(menuItem), "activate", 
+								G_CALLBACK(generateNetwork), NULL);
+  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuItem);
+  
+	menuItem = gtk_menu_item_new_with_label("Learn");
+  g_signal_connect(G_OBJECT(menuItem), "activate", 
+								G_CALLBACK(fileChoose), zone);
+  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuItem);
 
   menuItem = gtk_menu_item_new_with_label("Save");
   g_signal_connect(G_OBJECT(menuItem), "activate", G_CALLBACK(saveFile), zone);
@@ -194,13 +299,13 @@ int start(int argc, char **argv)
   menu = gtk_menu_new();
   /*Menu items*/
   menuItem = gtk_menu_item_new_with_label("Process");
-  //g_signal_connect(G_OBJECT(menuItem), "activate",
-  //     G_CALLBACK(cb_process), zone);
+  g_signal_connect(G_OBJECT(menuItem), "activate",
+       G_CALLBACK(process), zone);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuItem);
 
   menuItem = gtk_menu_item_new_with_label("Learn");
   g_signal_connect(G_OBJECT(menuItem), "activate",
-       G_CALLBACK(launchLearning), zone);
+       G_CALLBACK(fileChoose), zone);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuItem);
 
 
@@ -280,5 +385,3 @@ int start(int argc, char **argv)
 	gtk_main();
   return EXIT_SUCCESS;
 }
-
-
