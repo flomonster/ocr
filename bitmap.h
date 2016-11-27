@@ -35,12 +35,14 @@ typedef struct s_bitmapFileHeader bitmapFileHeader;
 struct s_bitmapInfoHeader;
 typedef struct s_bitmapInfoHeader bitmapInfoHeader;
 
-void draw(bitmap *img);
+void draw(bitmap *);
 
-void binarize(bitmap *img);
+void binarize(bitmap *);
 
-void resize(bitmap *img);
+void resize(bitmap *);
 
-bitmap *loadBmp(char *path);
+bitmap *loadBmp(char *);
+
+void saveBmp(char *, bitmap *);
 
 # endif

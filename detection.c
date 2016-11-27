@@ -248,51 +248,24 @@ queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
 /*
  * \brief create a new bitmap with width offset 
  *
- * \param src the orginal bitmap
+ * \param src the original bitmap
  */
 bitmap *widthTravel(bitmap *src)
 { 
   color *content = malloc(sizeof(color) * src->width * src->height);
-  int pos, C;
   for (unsigned i = 0; i < src->height; i++)
     for (unsigned j = 0; j < src->width; j++)
     {
       if ((src->content)[i * src->width + j].r == 0)
-        content[i * src->width + j] = newColor(0, 0, 0);
-      else
       {
-        if (j < 5 || j > src->width - 5)
-          content[i * src->width + j] = newColor(255, 255, 255);
-        else 
-        {
-          C = 20;  /*doit reussir a trouver la valeur exacte de C*/
-          pos = j - 1;
-          while (pos > 0 && C > 0 && 
-              (src->content)[i * src->width + pos].r != 0)
-          {
-            pos--;
-            C--;
-          }
-          if (pos > 0 && (src->content)[i * src->width + pos].r == 0)
-            content[i * src->width + j] = newColor(0, 0, 0);
-          else
-          {
-            C = 20; /*doit reussir a trouver la valeur exacte de C*/
-            pos = j + 1;
-            while ((unsigned)pos < src->width && C > 0 && 
-              (src->content)[i * src->width + pos].r != 0)
-            {
-              pos++;
-              C--;
-            }
-            if ((unsigned)pos < src->width &&
-              (src->content)[i * src->width + pos].r == 0)
-              content[i * src->width + j] = newColor(0, 0, 0);
-            else
-              content[i * src->width + j] = newColor(255, 255, 255);
-          }
-        }
+        content[i * src->width + j] = newColor(0, 0, 0);
+        for (unsigned k = j + 1; k < src->width-40 && k - j < src->width / 20; k++)
+          content[i * src->width + k] = newColor(0, 0, 0);
+        for (unsigned k = j - 1; k > 39 && j - k < src->width / 20; k--)
+          content[i * src->width + k] = newColor(0, 0, 0);
       }
+      else
+        content[i * src->width + j] = newColor(255, 255, 255);
     }
   bitmap *dst = malloc(sizeof(bitmap));
   dst->width = src->width;
@@ -309,46 +282,19 @@ bitmap *widthTravel(bitmap *src)
 bitmap *heightTravel(bitmap *src)
 {
   color *content = malloc(sizeof(color) * src->width * src->height);
-  int pos, C;
-  for (unsigned i = 0; i < src->width; i++)
-    for (unsigned j = 0; j < src->height; j++)
+  for (unsigned i = 0; i < src->height; i++)
+    for (unsigned j = 0; j < src->width; j++)
     {
-      if ((src->content)[j * src->width + i].r == 0)
-        content[j * src->width + i] = newColor(0, 0, 0);
-      else
+      if ((src->content)[i * src->width + j].r == 0)
       {
-        if (j < 5 || j > src->height - 5)
-          content[j * src->width + i] = newColor(255, 255, 255);
-        else  
-        {
-          C = 20;  /*doit reussir a trouver la valeur exacte de C*/
-          pos = j - 1;
-          while (pos > 0 && C > 0 && 
-              (src->content)[pos * src->width + i].r != 0)
-          {
-            pos--;
-            C--;
-          }
-          if (pos > 0 && (src->content)[pos * src->width + i].r == 0)
-            content[j * src->width + i] = newColor(0, 0, 0);
-          else
-          {
-            C = 20; /*doit reussir a trouver la valeur exacte de C*/
-            pos = j + 1;
-            while ((unsigned)pos < src->height && C > 0 && 
-               (src->content)[pos * src->width + i].r != 0)
-            {
-              pos++;
-              C--;
-            }
-            if ((unsigned)pos < src->height &&
-              (src->content)[pos * src->width + i].r == 0)
-              content[j * src->width + i] = newColor(0, 0, 0);
-            else
-              content[j * src->width + i] = newColor(255, 255, 255);
-          }
-        }
+        content[i * src->width + j] = newColor(0, 0, 0);
+        for (unsigned k = i + 1; k < src->height - 40 && k - i < src->height / 20; k++)
+          content[k * src->width + j] = newColor(0, 0, 0);
+        for (unsigned k = i - 1; k > 39 && i - k < src->height / 20; k--)
+          content[k * src->width + j] = newColor(0, 0, 0);
       }
+      else
+        content[i * src->width + j] = newColor(255, 255, 255);
     }
   bitmap *dst = malloc(sizeof(bitmap));
   dst->width = src->width;
@@ -384,8 +330,14 @@ bitmap *merge(bitmap *src1, bitmap *src2)
 
 char checkClass(histogram *histo, float* hm)
 {
-  float Rm = histo->DC / histo->TC;
-  return histo->deltaX < 3 * Rm && histo->deltaY < 3 * (*hm);
+  printf("dalta Y : %u | hm : %f", histo->deltaY, *hm);
+  float Rm;
+  if (histo->TC == 0)
+    Rm = 0;
+  else 
+    Rm = histo->DC / histo->TC;
+  //printf("x : %u / y : %u / deltaX : %u / deltaY : %u / DC : %u /TC : %u / hm : %f\n", histo->x, histo->y, histo->deltaX, histo->deltaY, histo->DC, histo->TC, hm[0]);
+  return /*histo->deltaX < 3 * Rm &&*/ histo->deltaY < 5 * (unsigned)(*hm);
 }
 
 /*
@@ -400,8 +352,6 @@ char checkClass(histogram *histo, float* hm)
 void makeHistogram(bitmap *bmp, bitmap *original, unsigned X, unsigned Y,
     queue *q)
 {
-  draw(bmp);
-  draw(original);
   unsigned DC = 0, TC = 0;
   histogram *histo = malloc(sizeof(histogram));
   histo->x = X;
@@ -411,9 +361,9 @@ void makeHistogram(bitmap *bmp, bitmap *original, unsigned X, unsigned Y,
   for (unsigned i = 0; i < bmp->height; i++)
     for (unsigned j = 0; j < bmp->width; j++)
     {
-      if (original->content[(i + X) * bmp->width + j + Y].r == 0)
+      if (original->content[(i + Y) * original->width + j + X].r == 0)
         DC++;
-      if (original->content[(i + X) * bmp->width + j + Y].r != 
+      if (original->content[(i + Y) * original->width + j + X].r != 
           bmp->content[i * bmp->width + j].r)
         TC++;
     }
@@ -510,7 +460,7 @@ queue *textToHisto(bitmap *src, bitmap *original, float *hm)
   if (nbLine == 0)
     *hm = 0;
   else 
-    *hm /= nbLine;
+    *hm = (*hm) / nbLine;
   return histoQueue;
 }
 
@@ -522,13 +472,10 @@ bitmap *histoToImage(bitmap *src, queue *histoQueue, float *hm)
   while (histoQueue->length > 0)
   {
     histogram *histo = deQueue(histoQueue);
-    printf("x : %u / y : %u / deltaX : %u / deltaY : %u / DC : %u /TC : %u \n",
-        histo->x, histo->y, histo->deltaX, histo->deltaY, histo->DC, histo->TC);
     if (checkClass(histo, hm))
     {
-      printf("Vraie \n");
-      for (unsigned i = histo->y; i < histo->deltaY; i++)
-        for (unsigned j = histo->x; j < histo->deltaX; j++)
+      for (unsigned i = histo->y; i < histo->y + histo->deltaY; i++)
+        for (unsigned j = histo->x; j < histo->x + histo->deltaX; j++)
           content[i * src->width + j] = src->content[i * src->width +j];
     }
   }
@@ -538,15 +485,18 @@ bitmap *histoToImage(bitmap *src, queue *histoQueue, float *hm)
 
 bitmap *rlsa(bitmap *src)
 {
+  binarize(src);
+  saveBmp("testSave.bmp",src);
   bitmap *first = widthTravel(src);
-  //draw(first);
+  saveBmp("testSavewidth.bmp", first);
   bitmap *seconde = heightTravel(src);
-  //draw(seconde);
+  saveBmp("testSaveheight.bmp", seconde);
   bitmap *fusion = merge(first, seconde);
-  //draw(fusion);
+  saveBmp("testSavefusion.bmp", fusion);
 
-  float hm = 0;
-  queue *histoQueue = textToHisto(fusion, src, &hm);
-  bitmap *final = histoToImage(src, histoQueue, &hm);
+  float hm[1] = {0};
+  queue *histoQueue = textToHisto(fusion, src, hm);
+  bitmap *final = histoToImage(src, histoQueue, hm);
+  saveBmp("testSavefinal.bmp", final);
   return final;
 }
