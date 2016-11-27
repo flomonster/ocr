@@ -21,6 +21,22 @@ __attribute__((const)) float sigmoid(float x)
 }
 
 /**
+ * \brief Softmax function
+ *
+ * \param k the vector dimesion
+ * \param z the vector
+ */
+void softmax(unsigned k, float *z)
+{
+  float sum = 0;
+  for (unsigned i = 0; i < k; i++)
+    sum += exp(z[i]); 
+  sum = sum == 0 ? 1 : sum;
+  for (unsigned i = 0; i < k; i++)
+    z[i] = exp(z[i]) / sum;
+}
+
+/**
  * \brief the activation function of a neural network
  *
  * \param n the neural network
@@ -31,7 +47,7 @@ void feedForward(network *n, float *inputs)
   for (unsigned i = 0; i < n->layers[0]; i++)
     n->out[0][i] = inputs[i];
 
-  for (unsigned i = 1; i < n->nblayer; i++)
+  for (unsigned i = 1; i < n->nblayer - 1; i++)
     for (unsigned j = 0; j < n->layers[i]; j++)
     {
       n->out[i][j] = n->threshold[i - 1][j];
@@ -39,6 +55,14 @@ void feedForward(network *n, float *inputs)
         n->out[i][j] += n->weight[i - 1][k][j] * n->out[i - 1][k];
       n->out[i][j] = sigmoid(n->out[i][j]);
     }
+  unsigned last = n->nblayer - 1;
+  for (unsigned j = 0; j < n->layers[last]; j++)
+  {
+    n->out[last][j] = n->threshold[last - 1][j];
+    for (unsigned k = 0; k < n->layers[last - 1]; k++)
+      n->out[last][j] += n->weight[last - 1][k][j] * n->out[last - 1][k];
+  }
+  softmax(n->layers[last], n->out[last]);
 }
 
 /**
@@ -93,18 +117,19 @@ void update(network *n, float speed)
  * \param results expected outputs of samples
  * \param nbSample the number of samples
  */
-float evaluate(network *n, float **samples, float **results, size_t sizeBatch,
-    int batch[])
+float evaluate(network *n, float **samples, float **results, size_t nbSample)
 {
   float error = 0;
   unsigned last = n->nblayer - 1;
-  for (size_t i = 0; i < sizeBatch; i++)
+  for (size_t i = 0; i < nbSample; i++)
   {
-    feedForward(n, samples[batch[i]]);
+    float dist = 0;
+    feedForward(n, samples[i]);
     for (unsigned j = 0; j < n->layers[last]; j++)
-      error += fabsf(n->out[last][j] - results[batch[i]][j]);
+      dist += pow(n->out[last][j] - results[i][j], 2);
+    error += sqrt(dist);
   }
-  return error / sizeBatch;
+  return error / (nbSample * 2);
 }
 
 /**

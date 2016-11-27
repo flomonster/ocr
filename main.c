@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     return 0;
 
   if (argv[1][0] == '0')
-    generateNetwork(256, 60 , 95);
+    generateNetwork(256, 80 , 95);
 
   else if (argv[1][0] == '1')
   {
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     network *n = loadNetwork("network.save");
 
     bitmap *img = loadBmp(argv[2]);
-    draw(img);
+    //draw(img);
     size_t *length = malloc(sizeof(size_t));
     size_t *useless = malloc(sizeof(size_t));
     queue *q = segmentation(img, useless, length);
