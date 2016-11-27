@@ -17,6 +17,7 @@
  * \param result the table of results
  * \param length the length of both table
  */
+
 void shuffleSample(float **samples, float **results, unsigned length)
 {
   for (unsigned i = length - 1; i > 0; i--)
@@ -71,6 +72,7 @@ float learn(network *n, float **samples, float **results, unsigned nbSample,
     }
   return evaluate(n, samples, results, nbSample);
 }
+
 
 /**
  * \brief learn to the network "network.save"
