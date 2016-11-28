@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
         {
           bitmap *letter = deQueue(word);
           resize(letter);
+          autoContrast(letter);
           binarize(letter);
           draw(letter);
           txt[i] = ocr(letter, n);
