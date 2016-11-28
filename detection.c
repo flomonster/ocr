@@ -251,27 +251,41 @@ queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
  * \param src the original bitmap
  */
 bitmap *widthTravel(bitmap *src)
-{ 
+{
+  unsigned step = 50;
   color *content = malloc(sizeof(color) * src->width * src->height);
+  for (unsigned i = 0; i < src->height * src->width; i++)
+    content[i] = newColor(255, 255, 255);
+
   for (unsigned i = 0; i < src->height; i++)
-    for (unsigned j = 0; j < src->width; j++)
+  {
+    unsigned j = 0, min = 0, max = 0, terminal;
+    while (j < src->width)
     {
-      if ((src->content)[i * src->width + j].r == 0)
+      if (!src->content[i * src->width + j].r)
       {
-        content[i * src->width + j] = newColor(0, 0, 0);
-        for (unsigned k = j + 1; k < src->width-40 && k - j < src->width / 20; k++)
+        unsigned k = j;
+        terminal = j - step < min ? min : j - step;
+        while (k > terminal)
+        {
           content[i * src->width + k] = newColor(0, 0, 0);
-        for (unsigned k = j - 1; k > 39 && j - k < src->width / 20; k--)
+          k--;
+        }
+
+        k = max < j ? j : max;
+        terminal = j + step > src->width ? src->width : j + step;
+        while (k < terminal)
+        {
           content[i * src->width + k] = newColor(0, 0, 0);
+          k++;
+        }
+        max = j + step;
+        min = j + step;
       }
-      else
-        content[i * src->width + j] = newColor(255, 255, 255);
+      j++;
     }
-  bitmap *dst = malloc(sizeof(bitmap));
-  dst->width = src->width;
-  dst->height = src->height;
-  dst->content = content;
-  return dst;
+  }
+  return newBitmap(src->width, src->height, content);
 }
 
 /*
@@ -281,26 +295,40 @@ bitmap *widthTravel(bitmap *src)
  */
 bitmap *heightTravel(bitmap *src)
 {
+  unsigned step = 50;
   color *content = malloc(sizeof(color) * src->width * src->height);
-  for (unsigned i = 0; i < src->height; i++)
-    for (unsigned j = 0; j < src->width; j++)
+  for (unsigned i = 0; i < src->width * src->height; i++)
+    content[i] = newColor(255, 255, 255);
+
+  for (unsigned i = 0; i < src->width; i++)
+  {
+    unsigned j = 0, min = 0, max = 0, terminal;
+    while (j < src->height)
     {
-      if ((src->content)[i * src->width + j].r == 0)
+      if (!src->content[j * src->width + i].r)
       {
-        content[i * src->width + j] = newColor(0, 0, 0);
-        for (unsigned k = i + 1; k < src->height - 40 && k - i < src->height / 20; k++)
-          content[k * src->width + j] = newColor(0, 0, 0);
-        for (unsigned k = i - 1; k > 39 && i - k < src->height / 20; k--)
-          content[k * src->width + j] = newColor(0, 0, 0);
+        unsigned k = j;
+        terminal = j - step < min ? min : j - step;
+        while (k > terminal)
+        {
+          content[k * src->width + i] = newColor(0, 0, 0);
+          k--;
+        }
+
+        k = max < j ? j : max;
+        terminal = j + step > src->height ? src->height : j + step;
+        while (k < terminal)
+        {
+          content[k * src->width + i] = newColor(0, 0, 0);
+          k++;
+        }
+        max = j + step;
+        min = j + step;
       }
-      else
-        content[i * src->width + j] = newColor(255, 255, 255);
+      j++;
     }
-  bitmap *dst = malloc(sizeof(bitmap));
-  dst->width = src->width;
-  dst->height = src->height;
-  dst->content = content;
-  return dst;
+  }
+  return newBitmap(src->width, src->height, content);
 }
 
 /*
@@ -330,14 +358,12 @@ bitmap *merge(bitmap *src1, bitmap *src2)
 
 char checkClass(histogram *histo, float* hm)
 {
-  printf("dalta Y : %u | hm : %f", histo->deltaY, *hm);
-  float Rm;
+  float rm;
   if (histo->TC == 0)
-    Rm = 0;
+    rm = 0;
   else 
-    Rm = histo->DC / histo->TC;
-  //printf("x : %u / y : %u / deltaX : %u / deltaY : %u / DC : %u /TC : %u / hm : %f\n", histo->x, histo->y, histo->deltaX, histo->deltaY, histo->DC, histo->TC, hm[0]);
-  return /*histo->deltaX < 3 * Rm &&*/ histo->deltaY < 5 * (unsigned)(*hm);
+    rm = (float)histo->DC / histo->TC;
+  return 2 < 10 * rm && histo->deltaY < 3 * (unsigned)(*hm);
 }
 
 /*
@@ -380,16 +406,13 @@ void makeHistogram(bitmap *bmp, bitmap *original, unsigned X, unsigned Y,
 queue *textToHisto(bitmap *src, bitmap *original, float *hm) 
 {
   unsigned nbLine = 0;
-
   queue *histoQueue = newQueue();
   bitmap *bmp = binerizeCopy(original); 
-
   char lineMarker[src->height];
   char columnMarker[src->width];
   putLineMarker(bmp, lineMarker);
-  unsigned Y, X, Y_, X_;
+  unsigned Y, X;
 
-  // Premier passage afin d'extraire les block noir 
   unsigned i = 0;
   while (i < src->height)
   {
@@ -410,44 +433,10 @@ queue *textToHisto(bitmap *src, bitmap *original, float *hm)
             j++;
          
           bitmap *bmpResult = cutBmp(src, X, Y, j - X, i - Y);
-          char lineMarker_[bmpResult->height];
-          char columnMarker_[bmpResult->width];
-          checkBlackLine(bmpResult, lineMarker_);
-          
-          // Deuxieme passage afin d'etre sur que les bloc noir sont individuel 
-          unsigned k = 0;
-          while (k < bmpResult->height)
-          {
-            if (k < bmpResult->height && lineMarker_[k] == 1)
-            {
-              Y_ = k;
-              while (k < bmpResult->height && lineMarker_[k] == 1)
-                k++;
-
-              checkBlackColumn(bmpResult, Y_, k, columnMarker_);
-              unsigned l = 0;
-              while (l < bmpResult->width)
-              {
-                if (l < bmpResult->width && columnMarker_[l] == 1)
-                {
-                  X_ = l;
-                  while (l < bmpResult->width && columnMarker_[l] == 1)
-                    l++;
-                  bitmap *final = cutBmp(bmpResult, X_, Y_, l - X_, k - Y_);
-                  makeHistogram(final, bmp, X_ + X, Y_ + Y, histoQueue);
-                  nbLine++;
-                  *hm += final->height;
-                }
-                else
-                  while (l < bmpResult->width && columnMarker_[l] == 0)
-                    l++;
-              }
-            }
-            else
-              while (k < bmpResult->height && lineMarker_[k] == 0)
-                k++;
-          }
-        }
+          makeHistogram(bmpResult, bmp, X, Y, histoQueue);
+          nbLine++;
+          *hm += bmpResult->height;
+        } 
         else
           while (j < src->width && columnMarker[j] == 0)
             j++;
@@ -463,7 +452,10 @@ queue *textToHisto(bitmap *src, bitmap *original, float *hm)
     *hm = (*hm) / nbLine;
   return histoQueue;
 }
-
+/*
+ *
+ *
+ */
 bitmap *histoToImage(bitmap *src, queue *histoQueue, float *hm)
 {
   color *content = malloc(sizeof(color) * src->width * src->height);
@@ -489,9 +481,9 @@ bitmap *rlsa(bitmap *src)
   saveBmp("testSave.bmp",src);
   bitmap *first = widthTravel(src);
   saveBmp("testSavewidth.bmp", first);
-  bitmap *seconde = heightTravel(src);
-  saveBmp("testSaveheight.bmp", seconde);
-  bitmap *fusion = merge(first, seconde);
+  bitmap *second = heightTravel(src);
+  saveBmp("testSaveheight.bmp", second);
+  bitmap *fusion = merge(first, second);
   saveBmp("testSavefusion.bmp", fusion);
 
   float hm[1] = {0};
