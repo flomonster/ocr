@@ -213,9 +213,9 @@ bitmap *loadBmp(char *path)
 */
 void autoContrast(bitmap *img)
 {
-  unsigned *histoR = malloc(256 * sizeof(unsigned));
-  unsigned *histoG = malloc(256 * sizeof(unsigned));
-  unsigned *histoB = malloc(256 * sizeof(unsigned));
+  unsigned *histoR = malloc(256 * sizeof(unsigned ));
+  unsigned *histoG = malloc(256 * sizeof(unsigned ));
+  unsigned *histoB = malloc(256 * sizeof(unsigned ));
 
   unsigned *histoRC = malloc(256 * sizeof(unsigned));
   unsigned *histoGC = malloc(256 * sizeof(unsigned));
@@ -227,7 +227,6 @@ void autoContrast(bitmap *img)
 
   unsigned j;  
   unsigned n = img->width * img->height;
-  unsigned i;
 
   for (j = 0; j < 256; j++)
   {
@@ -235,13 +234,19 @@ void autoContrast(bitmap *img)
     histoG[j] = 0;
     histoB[j] = 0;
   }
-  for (i = 0; i < n; i++)
+  for (j = 0; j < 256; j++)
   {
-    histoR[img->content[i].r]++;
-    histoG[img->content[i].g]++;
-    histoB[img->content[i].b]++;
+    histoRC[j] = 0;
+    histoGC[j] = 0;
+    histoBC[j] = 0;
   }
- 
+  for (j = 0; j < n; j++)
+  {
+    histoR[img->content[j].r]++;
+    histoG[img->content[j].g]++;
+    histoB[img->content[j].b]++;
+  }
+
   for (j = 0; j < 256; j++) 
   {
     cR += histoR[j];
@@ -252,11 +257,11 @@ void autoContrast(bitmap *img)
     histoBC[j] = cB;
   }
   
-  for (i = 0; i < n; i++)
+  for (j = 0; j < n; j++)
   {
-    img->content[i].r = 255 * i * histoRC[img->content[i].r] / n;
-    img->content[i].g = 255 * i * histoGC[img->content[i].g] / n;
-    img->content[i].b = 255 * i * histoBC[img->content[i].b] / n;
+    img->content[j].r = 255 * histoRC[img->content[j].r] / n;
+    img->content[j].g = 255 * histoGC[img->content[j].g] / n;
+    img->content[j].b = 255 * histoBC[img->content[j].b] / n;
   }
 
   free(histoR);
