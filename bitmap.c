@@ -231,3 +231,69 @@ void saveBmp(char *path, bitmap *bmp)
   fwrite(end, 1, 3, fp);
   fclose(fp);
 }
+
+/*
+ * \brief Equalize the histogram of the bitmap to raise the contrast
+ *
+ * \param bitmap *img : the bitmap
+*/
+void autoContrast(bitmap *img)
+{
+  unsigned *histoR = malloc(256 * sizeof(unsigned ));
+  unsigned *histoG = malloc(256 * sizeof(unsigned ));
+  unsigned *histoB = malloc(256 * sizeof(unsigned ));
+
+  unsigned *histoRC = malloc(256 * sizeof(unsigned));
+  unsigned *histoGC = malloc(256 * sizeof(unsigned));
+  unsigned *histoBC = malloc(256 * sizeof(unsigned));
+
+  unsigned cR = 0;
+  unsigned cG = 0;
+  unsigned cB = 0;
+
+  unsigned j;  
+  unsigned n = img->width * img->height;
+
+  for (j = 0; j < 256; j++)
+  {
+    histoR[j] = 0;
+    histoG[j] = 0;
+    histoB[j] = 0;
+  }
+  for (j = 0; j < 256; j++)
+  {
+    histoRC[j] = 0;
+    histoGC[j] = 0;
+    histoBC[j] = 0;
+  }
+  for (j = 0; j < n; j++)
+  {
+    histoR[img->content[j].r]++;
+    histoG[img->content[j].g]++;
+    histoB[img->content[j].b]++;
+  }
+
+  for (j = 0; j < 256; j++) 
+  {
+    cR += histoR[j];
+    histoRC[j] = cR;
+    cG += histoG[j];
+    histoGC[j] = cG;
+    cB += histoB[j];
+    histoBC[j] = cB;
+  }
+  
+  for (j = 0; j < n; j++)
+  {
+    img->content[j].r = 255 * histoRC[img->content[j].r] / n;
+    img->content[j].g = 255 * histoGC[img->content[j].g] / n;
+    img->content[j].b = 255 * histoBC[img->content[j].b] / n;
+  }
+
+  free(histoR);
+  free(histoG);
+  free(histoB);
+  free(histoRC);
+  free(histoGC);
+  free(histoBC);
+}

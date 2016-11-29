@@ -45,4 +45,6 @@ bitmap *loadBmp(char *);
 
 void saveBmp(char *, bitmap *);
 
+void autoContrast(bitmap *img);
+
 # endif
