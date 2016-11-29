@@ -3,6 +3,22 @@
 # include "queue.h"
 # include "detection.h"
 
+struct s_histogram
+{
+  unsigned x;
+  unsigned y;
+  unsigned deltaX;
+  unsigned deltaY;
+  unsigned dc;
+  unsigned tc;
+};
+typedef struct s_histogram histogram;
+
+/**
+ * \brief binerize the copy of an image
+ *
+ * \param src is the image to copy
+ */
 bitmap *binerizeCopy(bitmap *src)
 {
   color *content = malloc(sizeof(color) * src->height * src->width);
@@ -13,6 +29,12 @@ bitmap *binerizeCopy(bitmap *src)
   return bmp;
 }
 
+/**
+ * \brief Put a marker for each line with a letter
+ *
+ * \param img the full image
+ * \param array where marker is put in function of the img
+ */
 void putLineMarker(bitmap *img, char *array)
 {
   for(unsigned i = 0; i < img->height; i++)
@@ -25,6 +47,14 @@ void putLineMarker(bitmap *img, char *array)
   }
 }
 
+/**
+ * \brief Put a marker for each column with a letter
+ *
+ * \param img one line of the full image
+ * \param min X min
+ * \param max X max
+ * \param array where marker is put in function of the img *
+ */
 void putColumnMarker(bitmap *img, unsigned min, unsigned max, char *array)
 {
   for(unsigned i = 0; i < img->width; i++)
@@ -36,6 +66,12 @@ void putColumnMarker(bitmap *img, unsigned min, unsigned max, char *array)
   }
 }
 
+/**
+ * \brief Put a marker for each column with a letter
+ *
+ * \param img one line of the full image
+ * \param array where marker is put in function of the img *
+ */
 void checkBlackLine(bitmap *img, char *array)
 {
   for (unsigned i = 0; i < img->height; i++)
@@ -47,6 +83,14 @@ void checkBlackLine(bitmap *img, char *array)
   }
 }
 
+/**
+ * \brief check if there is a black pixel for the rlsa 
+ *
+ * \param img one line of the full image
+ * \param array where marker is put in function of the img *
+ * \param min X min 
+ * \param max X max
+ */
 void checkBlackColumn(bitmap *img, char *array, unsigned min, unsigned max)
 {
   for(unsigned i = 0; i < img->width; i++)
@@ -58,6 +102,15 @@ void checkBlackColumn(bitmap *img, char *array, unsigned min, unsigned max)
   }
 }
 
+/**
+ * \brief Create a bitmap from an other
+ *
+ * \param img full img
+ * \param X min x
+ * \param Y min y
+ * \param width the width of the new bitmap
+ * \param height the height of the new bitmap
+ */
 bitmap *cutBmp(bitmap *img, unsigned x, unsigned y,
     unsigned width, unsigned height)
 {
@@ -71,6 +124,12 @@ bitmap *cutBmp(bitmap *img, unsigned x, unsigned y,
   return bmp;
 }
 
+/**
+ * \brief find the length average of letters for one line
+ *
+ * \param columnMarker array where there are marker for each pixel
+ * \param width is the width of the columnMarker
+ */
 float letterLengthAverage(char *columnMarker, unsigned width)
 {
   float nbLetter = 0;
@@ -90,13 +149,15 @@ float letterLengthAverage(char *columnMarker, unsigned width)
     while (i < width && columnMarker[i] == 0)
       i++;
   }
-  if (nbLetter == 0)
-    return 0;
-  if (!nbLetter)
-    return 0;
-  return sumWidthLetter / nbLetter;
+  return !nbLetter ? 0 : sumWidthLetter / nbLetter;
 }
 
+/**
+ * \brief find the height average of a line
+ *
+ * \param lineMarker array where there are marker for each pixel
+ * \param height is the height of the lineMarker
+ */
 float lineHeigthAverage(char *lineMarker, unsigned height)
 {
   float nbLine = 0;
@@ -116,11 +177,14 @@ float lineHeigthAverage(char *lineMarker, unsigned height)
     while (i < height && lineMarker[i] == 0)
       i++;
   }
-  if (!nbLine)
-    return 0;
-  return sumHeightLine / nbLine;
+  return !nbLine ? 0 : sumHeightLine / nbLine;
 }
 
+/**
+ * \brief Create a queue with all letter in a bitmap
+ *
+ * \param img the full image
+ */
 queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
 {
   *nbCharacter = 0;
@@ -186,6 +250,11 @@ queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
   return q;
 }
 
+/**
+ * \brief create a new bitmap with width offset 
+ *
+ * \param src the original bitmap
+ */
 bitmap *widthTravel(bitmap *src)
 {
   unsigned step = 150;
@@ -224,6 +293,11 @@ bitmap *widthTravel(bitmap *src)
   return newBitmap(src->width, src->height, content);
 }
 
+/**
+ * \brief create a new bitmap with height offset 
+ *
+ * \param src the orginal bitmap
+ */
 bitmap *heightTravel(bitmap *src)
 {
   unsigned step = 50;
@@ -262,6 +336,12 @@ bitmap *heightTravel(bitmap *src)
   return newBitmap(src->width, src->height, content);
 }
 
+/**
+ * \brief Fusion two bitmap in one other 
+ *
+ * \param src1 the first bitmap 
+ * \param src2 the second bitmap
+ */
 bitmap *merge(bitmap *src1, bitmap *src2)
 {
   color *content = malloc(sizeof(color) * src1->width * src1->height);
@@ -281,6 +361,12 @@ bitmap *merge(bitmap *src1, bitmap *src2)
   return dst;
 }
 
+/**
+ * \brief check is a block is a block of text 
+ *
+ * \param histo is the hsitogram of a block 
+ * \param hm is the average height of blocks
+ */
 char checkClass(histogram *histo, float* hm)
 {
   float rm;
@@ -290,6 +376,15 @@ char checkClass(histogram *histo, float* hm)
   return 2 < 10 * rm  && histo->deltaY < 3 * (unsigned)(*hm);
 }
 
+/**
+ * \brief make the histogram of one block and add it in a queue
+ *
+ * \param bmp is the block 
+ * \param original is copy binarize of the original image 
+ * \param X higth left corner of the block on the copy in abscisse 
+ * \param Y higth left corner of the block on the copy in ordonate
+ * \param q is the queue where we add the hsitogram
+ */
 void makeHistogram(bitmap *bmp, bitmap *original, unsigned x, unsigned y,
     queue *q)
 {
@@ -313,6 +408,11 @@ void makeHistogram(bitmap *bmp, bitmap *original, unsigned x, unsigned y,
   enQueue(q, histo);
 }
 
+/**
+ * \brief Return an image without black line et draw
+ *
+ * \param src the original image
+ */
 queue *textToHisto(bitmap *src, bitmap *original, float *hm) 
 {
   unsigned nbLine = 0;
@@ -358,13 +458,17 @@ queue *textToHisto(bitmap *src, bitmap *original, float *hm)
         i++;
   }
   freeBitmap(bmp);
-  if (!nbLine)
-    *hm = 0;
-  else 
-    *hm = (*hm) / nbLine;
+  *hm = !nbLine ? 0 : (*hm) /nbLine;
   return histoQueue;
 }
 
+/**
+ * \brief make image from a queue of histogram
+ *
+ * \param src is the original image
+ * \histoQueue is the queue with contain all histograms
+ * \hm is the average height of block in the image 
+ */
 bitmap *histoToImage(bitmap *src, queue *histoQueue, float *hm)
 {
   color *content = malloc(sizeof(color) * src->width * src->height);
@@ -386,6 +490,11 @@ bitmap *histoToImage(bitmap *src, queue *histoQueue, float *hm)
   return result;
 }
 
+/**
+ * \brief return a image with line and draw
+ *
+ * \param src is the orignal image
+ */
 bitmap *rlsa(bitmap *src)
 {
   bitmap *copy = binerizeCopy(src);

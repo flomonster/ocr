@@ -121,8 +121,8 @@ void binarize(bitmap *img)
  */
 void resize(bitmap *img)
 {
-  unsigned newWidth = 140;
-  unsigned newHeight = 200;
+  unsigned newWidth = 16;
+  unsigned newHeight = 16;
   unsigned pos, pos2;
   unsigned count;
   unsigned short sumR, sumG, sumB;
