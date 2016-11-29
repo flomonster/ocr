@@ -11,8 +11,8 @@ struct s_histogram
   unsigned y;
   unsigned deltaX;
   unsigned deltaY;
-  unsigned DC;
-  unsigned TC;
+  unsigned dc;
+  unsigned tc;
 };
 typedef struct s_histogram histogram;
 

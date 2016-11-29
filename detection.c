@@ -58,14 +58,14 @@ void checkBlackColumn(bitmap *img, char *array, unsigned min, unsigned max)
   }
 }
 
-bitmap *cutBmp(bitmap *img, unsigned X, unsigned Y,
+bitmap *cutBmp(bitmap *img, unsigned x, unsigned y,
     unsigned width, unsigned height)
 {
   color *content = malloc(sizeof(color) * height * width);
   for (unsigned i = 0; i < height; i++)
   {
     for (unsigned j = 0; j < width; j++)
-      content[i * width + j] = img->content[(i + Y) * img->width + j + X];
+      content[i * width + j] = img->content[(i + y) * img->width + j + x];
   }
   bitmap *bmp = newBitmap(width, height, content);
   return bmp;
@@ -92,6 +92,8 @@ float letterLengthAverage(char *columnMarker, unsigned width)
   }
   if (nbLetter == 0)
     return 0;
+  if (!nbLetter)
+    return 0;
   return sumWidthLetter / nbLetter;
 }
 
@@ -114,7 +116,7 @@ float lineHeigthAverage(char *lineMarker, unsigned height)
     while (i < height && lineMarker[i] == 0)
       i++;
   }
-  if (nbLine == 0)
+  if (!nbLine)
     return 0;
   return sumHeightLine / nbLine;
 }
@@ -129,7 +131,7 @@ queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
   char lineMarker[img->height];
   char columnMarker[img->width];
   putLineMarker(bmp, lineMarker);
-  unsigned Y, X;
+  unsigned y, x;
   float letterAverage;
 
   unsigned i = 0;
@@ -137,12 +139,12 @@ queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
   {
     if (i < img->height && lineMarker[i] == 1)
     {
-      Y = i;
+      y = i;
       while (i < img->height && lineMarker[i] == 1)
         i++;
 
       queue *line = newQueue();
-      putColumnMarker(bmp, Y, i, columnMarker);
+      putColumnMarker(bmp, y, i, columnMarker);
       letterAverage = letterLengthAverage(columnMarker, img->width);
       queue *word = newQueue();
 
@@ -151,20 +153,20 @@ queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
       {
         if (j < img->width && columnMarker[j] == 1)
         {
-          X = j;
+          x = j;
           while (j < img->width && columnMarker[j] == 1)
             j++;
 
-          bitmap *bmpResult = cutBmp(img, X, Y, j - X, i - Y);
+          bitmap *bmpResult = cutBmp(img, x, y, j - x, i - y);
           enQueue(word, bmpResult);
           (*nbCharacter)++;
         }
         else
         {
-          X = j;
+          x = j;
           while (j < img->width && columnMarker[j] == 0)
             j++;
-          if ((float)j - X > letterAverage / 1.5 && j < img->width &&
+          if ((float)j - x > letterAverage / 1.5 && j < img->width &&
               word->length )
           {
             enQueue(line, word);
@@ -282,32 +284,32 @@ bitmap *merge(bitmap *src1, bitmap *src2)
 char checkClass(histogram *histo, float* hm)
 {
   float rm;
-  if (histo->TC == 0)
+  if (histo->tc == 0)
     return 0; 
-  rm = (float)histo->DC / histo->TC;
+  rm = (float)histo->dc / histo->tc;
   return 2 < 10 * rm  && histo->deltaY < 3 * (unsigned)(*hm);
 }
 
-void makeHistogram(bitmap *bmp, bitmap *original, unsigned X, unsigned Y,
+void makeHistogram(bitmap *bmp, bitmap *original, unsigned x, unsigned y,
     queue *q)
 {
-  unsigned DC = 0, TC = 0;
+  unsigned dc = 0, tc = 0;
   histogram *histo = malloc(sizeof(histogram));
-  histo->x = X;
-  histo->y = Y;
+  histo->x = x;
+  histo->y = y;
   histo->deltaX = bmp->width;
   histo->deltaY = bmp->height;
   for (unsigned i = 0; i < bmp->height; i++)
     for (unsigned j = 0; j < bmp->width; j++)
     {
-      if (original->content[(i + Y) * original->width + j + X].r == 0)
-        DC++;
-      if (original->content[(i + Y) * original->width + j + X].r != 
+      if (original->content[(i + y) * original->width + j + x].r == 0)
+        dc++;
+      if (original->content[(i + y) * original->width + j + x].r != 
           bmp->content[i * bmp->width + j].r)
-        TC++;
+        tc++;
     }
-  histo->DC = DC;
-  histo->TC = TC;
+  histo->dc = dc;
+  histo->tc = tc;
   enQueue(q, histo);
 }
 
@@ -319,29 +321,29 @@ queue *textToHisto(bitmap *src, bitmap *original, float *hm)
   char lineMarker[src->height];
   char columnMarker[src->width];
   putLineMarker(bmp, lineMarker);
-  unsigned Y, X;
+  unsigned y, x;
 
   unsigned i = 0;
   while (i < src->height)
   {
     if (i < src->height && lineMarker[i] == 1)
     {
-      Y = i;
+      y = i;
       while (i < src->height && lineMarker[i] == 1)
         i++;
 
-      putColumnMarker(bmp, Y, i, columnMarker);
+      putColumnMarker(bmp, y, i, columnMarker);
       unsigned j = 0;
       while (j < src->width)
       {
         if (j < src->width && columnMarker[j] == 1)
         {
-          X = j;
+          x = j;
           while (j < src->width && columnMarker[j] == 1)
             j++;
          
-          bitmap *bmpResult = cutBmp(src, X, Y, j - X, i - Y);
-          makeHistogram(bmpResult, bmp, X, Y, histoQueue);
+          bitmap *bmpResult = cutBmp(src, x, y, j - x, i - y);
+          makeHistogram(bmpResult, bmp, x, y, histoQueue);
           nbLine++;
           *hm += bmpResult->height;
           freeBitmap(bmpResult);
@@ -356,7 +358,7 @@ queue *textToHisto(bitmap *src, bitmap *original, float *hm)
         i++;
   }
   freeBitmap(bmp);
-  if (nbLine == 0)
+  if (!nbLine)
     *hm = 0;
   else 
     *hm = (*hm) / nbLine;
@@ -386,19 +388,14 @@ bitmap *histoToImage(bitmap *src, queue *histoQueue, float *hm)
 
 bitmap *rlsa(bitmap *src)
 {
-  binarize(src);
-  saveBmp("Save.bmp",src);
-  bitmap *first = widthTravel(src);
-  saveBmp("Savewidth.bmp", first);
-  bitmap *second = heightTravel(src);
-  saveBmp("Saveheight.bmp", second);
+  bitmap *copy = binerizeCopy(src);
+  bitmap *first = widthTravel(copy);
+  bitmap *second = heightTravel(copy);
   bitmap *fusion = merge(first, second);
-  saveBmp("Savefusion.bmp", fusion);
 
   float hm[1] = {0};
   queue *histoQueue = textToHisto(fusion, src, hm);
   bitmap *final = histoToImage(src, histoQueue, hm);
-  saveBmp("Savefinal.bmp", final);
 
   freeBitmap(first);
   freeBitmap(second);
