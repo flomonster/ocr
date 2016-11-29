@@ -205,11 +205,37 @@ bitmap *loadBmp(char *path)
   return bmp;
 }
 
+void saveBmp(char *path, bitmap *bmp)
+{
+  FILE *fp = fopen(path, "w+");
+  char start[] = {66, 77, 76, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 12, 0, 0, 0}; 
+  fwrite(start, 1, 18, fp);
+  fwrite(&(bmp->width), 2, 1, fp); 
+  fwrite(&(bmp->height), 2, 1, fp); 
+  char middle[] = {1, 0, 24, 0};
+  fwrite(middle, 1, 4, fp); 
+
+  int padding = 4 - (bmp->width * 3) % 4;
+  if (padding == 4)
+    padding = 0;
+
+  char end[] = {0, 0, 0};
+  for (int i = bmp->height - 1; i >= 0; i--)
+  {
+    for (unsigned j = 0; j < bmp->width; j++)
+      fwrite((bmp->content) + i * bmp->width + j, 3, 1, fp);
+    if (padding)
+      fwrite(end, 1, padding, fp);
+  }
+
+  fwrite(end, 1, 3, fp);
+  fclose(fp);
+}
+
 /*
  * \brief Equalize the histogram of the bitmap to raise the contrast
  *
  * \param bitmap *img : the bitmap
- *
 */
 void autoContrast(bitmap *img)
 {
