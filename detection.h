@@ -17,9 +17,7 @@ void checBlackColumn(bitmap *, char *, unsigned, unsigned);
 
 bitmap *cutBmp(bitmap *, unsigned, unsigned, unsigned, unsigned);
 
-float letterLengthAverage(char *, unsigned);
-
-float lineHeigthAverage(char *, unsigned);
+float letterAverage(char *, unsigned);
 
 queue *segmentation(bitmap *, size_t *, size_t *);
 

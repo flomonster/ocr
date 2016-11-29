@@ -130,13 +130,13 @@ bitmap *cutBmp(bitmap *img, unsigned x, unsigned y,
  * \param columnMarker array where there are marker for each pixel
  * \param width is the width of the columnMarker
  */
-float letterLengthAverage(char *columnMarker, unsigned width)
+float letterAverage(char *columnMarker, unsigned width)
 {
   float nbLetter = 0;
   float sumWidthLetter = 0;
 
   unsigned i = 0;
-  while (i < width && columnMarker[i] == 0)
+  while (i < width && !columnMarker[i])
     i++;
   while (i < width)
   {
@@ -146,38 +146,10 @@ float letterLengthAverage(char *columnMarker, unsigned width)
       i++;
     }
     nbLetter++;
-    while (i < width && columnMarker[i] == 0)
+    while (i < width && !columnMarker[i])
       i++;
   }
   return !nbLetter ? 0 : sumWidthLetter / nbLetter;
-}
-
-/**
- * \brief find the height average of a line
- *
- * \param lineMarker array where there are marker for each pixel
- * \param height is the height of the lineMarker
- */
-float lineHeigthAverage(char *lineMarker, unsigned height)
-{
-  float nbLine = 0;
-  float sumHeightLine = 0;
-
-  unsigned i = 0;
-  while (i < height && lineMarker[i] == 0)
-    i++;
-  while (i < height)
-  {
-    while (i < height && lineMarker[i] == 1)
-    {
-      sumHeightLine++;
-      i++;
-    }
-    nbLine++;
-    while (i < height && lineMarker[i] == 0)
-      i++;
-  }
-  return !nbLine ? 0 : sumHeightLine / nbLine;
 }
 
 /**
@@ -189,14 +161,17 @@ queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
 {
   *nbCharacter = 0;
   *nbLetter = 0;
-  bitmap *bmp = binerizeCopy(img);
 
+  bitmap *bmp = binerizeCopy(img);
   queue *q = newQueue();
   char lineMarker[img->height];
   char columnMarker[img->width];
-  putLineMarker(bmp, lineMarker);
+  float widthAverage;
   unsigned y, x;
-  float letterAverage;
+
+  putLineMarker(bmp, lineMarker);
+  float heightAverage = letterAverage(lineMarker, img->height);
+  queue *paragraph = newQueue();
 
   unsigned i = 0;
   while (i < img->height)
@@ -207,9 +182,9 @@ queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
       while (i < img->height && lineMarker[i] == 1)
         i++;
 
-      queue *line = newQueue();
       putColumnMarker(bmp, y, i, columnMarker);
-      letterAverage = letterLengthAverage(columnMarker, img->width);
+      
+      widthAverage = letterAverage(columnMarker, img->width);
       queue *word = newQueue();
 
       unsigned j = 0;
@@ -228,23 +203,36 @@ queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
         else
         {
           x = j;
-          while (j < img->width && columnMarker[j] == 0)
+          while (j < img->width && !columnMarker[j])
             j++;
-          if ((float)j - x > letterAverage / 1.5 && j < img->width &&
+          if ((float)j - x > widthAverage * .5 && j < img->width &&
               word->length )
           {
-            enQueue(line, word);
+            enQueue(paragraph, word);
             word = newQueue();
             (*nbLetter)++;
           }
         }
       }
-      enQueue(line, word);
-      enQueue(q, line);
-      *nbLetter += 2;
+      enQueue(paragraph, word);
+      (*nbLetter)++;
     }
-    i++;
+    else 
+    {
+      y = i;
+      while (i < img->height && !lineMarker[i])
+        i++;
+      if (i - y > heightAverage && i < img->height && 
+          paragraph->length)
+      {
+        enQueue(q, paragraph);
+        paragraph = newQueue();
+        (*nbLetter)++;
+      }
+    }
   }
+  enQueue(q, paragraph);
+  (*nbLetter)++;
   *nbLetter += *nbCharacter;
   freeBitmap(bmp);
   return q;
@@ -257,19 +245,19 @@ queue *segmentation(bitmap *img, size_t *nbCharacter, size_t *nbLetter)
  */
 bitmap *widthTravel(bitmap *src)
 {
-  unsigned step = 150;
+  int step = 150;
   color *content = malloc(sizeof(color) * src->width * src->height);
   for (unsigned i = 0; i < src->height * src->width; i++)
     content[i] = newColor(255, 255, 255);
 
   for (unsigned i = 0; i < src->height; i++)
   {
-    unsigned j = 0, min = 0, max = 0, terminal;
-    while (j < src->width)
+    int j = 0, min = 0, max = 0, terminal;
+    while (j < (int)src->width)
     {
       if (!src->content[i * src->width + j].r)
       {
-        unsigned k = j;
+        int k = j;
         terminal = j - step < min ? min : j - step;
         while (k > terminal)
         {
@@ -278,7 +266,7 @@ bitmap *widthTravel(bitmap *src)
         }
 
         k = max < j ? j : max;
-        terminal = j + step > src->width ? src->width : j + step;
+        terminal = j + step > (int)src->width ? (int)src->width : j + step;
         while (k < terminal)
         {
           content[i * src->width + k] = newColor(0, 0, 0);
@@ -300,19 +288,19 @@ bitmap *widthTravel(bitmap *src)
  */
 bitmap *heightTravel(bitmap *src)
 {
-  unsigned step = 50;
+  int step = 100;
   color *content = malloc(sizeof(color) * src->width * src->height);
   for (unsigned i = 0; i < src->width * src->height; i++)
     content[i] = newColor(255, 255, 255);
 
   for (unsigned i = 0; i < src->width; i++)
   {
-    unsigned j = 0, min = 0, max = 0, terminal;
-    while (j < src->height)
+    int j = 0, min = 0, max = 0, terminal;
+    while (j < (int)src->height)
     {
       if (!src->content[j * src->width + i].r)
       {
-        unsigned k = j;
+        int k = j;
         terminal = j - step < min ? min : j - step;
         while (k > terminal)
         {
@@ -321,7 +309,7 @@ bitmap *heightTravel(bitmap *src)
         }
 
         k = max < j ? j : max;
-        terminal = j + step > src->height ? src->height : j + step;
+        terminal = j + step > (int)src->height ? (int)src->height : j + step;
         while (k < terminal)
         {
           content[k * src->width + i] = newColor(0, 0, 0);
@@ -506,6 +494,7 @@ bitmap *rlsa(bitmap *src)
   queue *histoQueue = textToHisto(fusion, src, hm);
   bitmap *final = histoToImage(src, histoQueue, hm);
 
+  freeBitmap(copy);
   freeBitmap(first);
   freeBitmap(second);
   freeBitmap(fusion);
