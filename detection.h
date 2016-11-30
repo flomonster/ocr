@@ -29,10 +29,10 @@ bitmap *merge(bitmap *, bitmap *);
 
 void makeHistogram(bitmap *, bitmap *, unsigned, unsigned, queue *);
 
-queue *textToHisto(bitmap *, bitmap *, float *);
+void textToHisto(queue *, bitmap *, bitmap *, float *, unsigned);
 
-bitmap *histoToImage(bitmap *, queue *, float *);
+void histoToImage(bitmap *, bitmap *, queue *, float *);
 
-bitmap *rlsa(bitmap *);
+bitmap *rlsa(bitmap *, queue *, queue *);
 
 # endif
