@@ -1,3 +1,11 @@
+/**
+ * \file bitmap.c
+ * \brief Structs and fonctions on bitmap
+ * \author astain_d and issarn_t
+ * \date 10/04/2016
+ *
+ */
+
 # include <stdio.h>
 # include <stdlib.h>
 # include <stdint.h>
@@ -66,6 +74,12 @@ bitmap *newBitmap(unsigned width, unsigned height, color *content)
   img->content = content;
   return img;
 }
+
+/**
+ * \brief free the bitmap
+ *
+ * \param bitmap *img the bitmap to free
+ */
 
 void freeBitmap(bitmap *img)
 {
@@ -206,6 +220,13 @@ bitmap *loadBmp(char *path)
   return bmp;
 }
 
+/*
+ * \brief save the bmp with the path name
+ *
+ * \param bitmap *img : the bitmap
+ * \param char *path the name of the saved bmp
+*/
+
 void saveBmp(char *path, bitmap *bmp)
 {
   FILE *fp = fopen(path, "w+");
@@ -298,6 +319,13 @@ void autoContrast(bitmap *img)
   free(histoGC);
   free(histoBC);
 }
+
+/*
+ * \brief rotate the bmp by angle degree
+ *
+ * \param bitmap *ing the bmp to rotate
+ * \param double angle the angle of the rotation, in degree
+ */
 
 void rotate(bitmap *img, double angle)
 {
