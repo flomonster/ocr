@@ -7,9 +7,9 @@
 
 bitmap *binerizeCopy(bitmap *);
 
-void putLineMarker(bitmap *, char *);
+void putLineMarker(bitmap *, char *, int, unsigned);
 
-void putColumnMarker(bitmap *, unsigned, unsigned, char *);
+void putColumnMarker(bitmap *, unsigned, unsigned, char *, int, unsigned);
 
 void checBlackLine(bitmap *, char *);
 
@@ -19,7 +19,7 @@ bitmap *cutBmp(bitmap *, unsigned, unsigned, unsigned, unsigned);
 
 float letterAverage(char *, unsigned);
 
-queue *segmentation(bitmap *, size_t *, size_t *);
+void segmentation(bitmap *, size_t *, size_t *, queue *, bitmap *, int);
 
 bitmap *widthTravel(bitmap *);
 
@@ -34,5 +34,7 @@ void textToHisto(queue *, bitmap *, bitmap *, float *, unsigned);
 void histoToImage(bitmap *, bitmap *, queue *, float *);
 
 bitmap *rlsa(bitmap *, queue *, queue *);
+
+queue *doTheThings(bitmap *, size_t *, size_t *);
 
 # endif
