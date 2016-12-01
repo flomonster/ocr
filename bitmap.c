@@ -346,8 +346,17 @@ void rotate(bitmap *img, double angle)
   {
     x = i % img->width;
     y = (i - x) / img->width;
-    x2 = cos(angle) * (double)x + sin(angle) * (double)y;
-    y2 = - sin(angle) * (double)x + cos(angle) * (double)y;
+    //x2 = cos(angle) * (double)x + sin(angle) * (double)y;
+    //y2 = - sin(angle) * (double)x + cos(angle) * (double)y;
+    
+    x2 = x - tan(angle / 2) * y;
+    y2 = y;
+
+    x2 = x2;
+    y2 = y2 + sin(angle) * x2;
+
+    x2 = x2 - tan(angle / 2) * y2;
+    y2 = y2;
     if (x2 >= 0 && x2 < (double)img->width)
     {
       if (y2 >= 0 && y2 < (double)img->height)
