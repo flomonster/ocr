@@ -162,9 +162,7 @@ float letterAverage(char *columnMarker, unsigned width)
 void segmentation(bitmap *img, size_t *nbCharacter,
     size_t *nbLetter, queue *q, bitmap *cutedImage, int pos)
 {
-  *nbCharacter = 0;
-  *nbLetter = 0;
-
+ 
   bitmap *bmp = binerizeCopy(img);
   char lineMarker[cutedImage->height];
   char columnMarker[cutedImage->width];
@@ -245,7 +243,7 @@ void segmentation(bitmap *img, size_t *nbCharacter,
  */
 bitmap *widthTravel(bitmap *src)
 {
-  int step = 50;
+  int step = 25;
   color *content = malloc(sizeof(color) * src->width * src->height);
   for (unsigned i = 0; i < src->height * src->width; i++)
     content[i] = newColor(255, 255, 255);
@@ -288,7 +286,7 @@ bitmap *widthTravel(bitmap *src)
  */
 bitmap *heightTravel(bitmap *src)
 {
-  int step = 100;
+  int step = 50;
   color *content = malloc(sizeof(color) * src->width * src->height);
   for (unsigned i = 0; i < src->width * src->height; i++)
     content[i] = newColor(255, 255, 255);
@@ -542,7 +540,10 @@ queue *doTheThings(bitmap * src, size_t *useless, size_t * length)
   queue *posQueue = newQueue();
   queue *imgQueue = newQueue();
   bitmap *rlsaImage = rlsa(src, imgQueue, posQueue);
-  
+  saveBmp("rlsaImage.bmp", rlsaImage);
+  *useless = 0;
+  *length = 0;
+
   queue *q = newQueue();
   while (posQueue->length)
   {
