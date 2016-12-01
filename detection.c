@@ -57,7 +57,9 @@ void putLineMarker(bitmap *img, char *array, int pos, unsigned width)
 void putColumnMarker(bitmap *img, unsigned min, unsigned max, char *array,
     int pos, unsigned width)
 {
-  for(unsigned i = pos; i < pos + width; i++)
+  for (unsigned i = 0; i > width; i++)
+    array[i] = 0;
+  for (unsigned i = pos; i < pos + width; i++)
   {
     unsigned j = min;
     while (j < max && img->content[j * img->width + i].r)
@@ -153,37 +155,33 @@ float letterAverage(char *columnMarker, unsigned width)
 }
 
 /**
- * \brief Create a queue with all letter in a bitmap
+ * \brierepeats 119 times>, f Create a queue with all letter in a bitmap
  *
  * \param img the full image
  */
 void segmentation(bitmap *img, size_t *nbCharacter,
     size_t *nbLetter, queue *q, bitmap *cutedImage, int pos)
 {
-  queue *column = newQueue();
-
   *nbCharacter = 0;
   *nbLetter = 0;
 
   bitmap *bmp = binerizeCopy(img);
-
   char lineMarker[cutedImage->height];
   char columnMarker[cutedImage->width];
   float widthAverage;
   unsigned y, x;
 
   putLineMarker(bmp, lineMarker, pos, cutedImage->width);
-  saveBmp("colonne.bmp", bmp);
   float heightAverage = letterAverage(lineMarker, cutedImage->height);
   queue *paragraph = newQueue();
 
   unsigned i = 0;
-  while (i < img->height)
+  while (i < cutedImage->height)
   {
-    if (i < img->height && lineMarker[i])
+    if (i < cutedImage->height && lineMarker[i])
     {
       y = i;
-      while (i < img->height && lineMarker[i])
+      while (i < cutedImage->height && lineMarker[i])
         i++;
 
       putColumnMarker(bmp, y, i, columnMarker, pos, cutedImage->width);
@@ -191,12 +189,12 @@ void segmentation(bitmap *img, size_t *nbCharacter,
       queue *word = newQueue();
 
       unsigned j = pos;
-      while (j < cutedImage->width)
+      while (j < cutedImage->width + pos)
       {
-        if (j < cutedImage->width && columnMarker[j] == 1)
+        if (j < cutedImage->width + pos && columnMarker[j] == 1)
         {
           x = j;
-          while (j < cutedImage->width && columnMarker[j] == 1)
+          while (j < cutedImage->width + pos && columnMarker[j] == 1)
             j++;
 
           bitmap *bmpResult = cutBmp(img, x, y, j - x, i - y);
@@ -206,9 +204,9 @@ void segmentation(bitmap *img, size_t *nbCharacter,
         else
         {
           x = j;
-          while (j < cutedImage->width && !columnMarker[j])
+          while (j < cutedImage->width + pos && !columnMarker[j])
             j++;
-          if ((float)j - x > widthAverage && j < cutedImage->width &&
+          if ((float)j - x > widthAverage && j < cutedImage->width + pos && 
               word->length )
           {
             enQueue(paragraph, word);
@@ -225,18 +223,16 @@ void segmentation(bitmap *img, size_t *nbCharacter,
       y = i;
       while (i < cutedImage->height && !lineMarker[i])
         i++;
-      if (i - y > heightAverage * 1.5 && i < cutedImage->height && 
+      if ((float)i - y > heightAverage && i < cutedImage->height && 
           paragraph->length)
       {
-        enQueue(column, paragraph);
+        enQueue(q, paragraph);
         paragraph = newQueue();
         (*nbLetter)++;
       }
     }
   }
-  enQueue(column, paragraph);
-  (*nbLetter)++;
-  enQueue(q, column);
+  enQueue(q, paragraph);
   (*nbLetter)++;
   *nbLetter += *nbCharacter;
   freeBitmap(bmp);
@@ -249,7 +245,7 @@ void segmentation(bitmap *img, size_t *nbCharacter,
  */
 bitmap *widthTravel(bitmap *src)
 {
-  int step = 15;
+  int step = 50;
   color *content = malloc(sizeof(color) * src->width * src->height);
   for (unsigned i = 0; i < src->height * src->width; i++)
     content[i] = newColor(255, 255, 255);
@@ -398,7 +394,7 @@ void columnCut(bitmap *src, queue *imgQueue, queue *posQueue)
 /**
  * \brief make the histogram of one block and add it in a queue
  *
- * \param bmp is the block 
+ * \param bmp is the block repeats 119 times>, 
  * \param original is copy binarize of the original image 
  * \param X higth left corner of the block on the copy in abscisse 
  * \param Y higth left corner of the block on the copy in ordonate
@@ -511,11 +507,8 @@ bitmap *rlsa(bitmap *src, queue *imgQueue, queue *posQueue)
 {
   bitmap *copy = binerizeCopy(src);
   bitmap *first = widthTravel(copy);
-  saveBmp("first.bmp", first);
   bitmap *second = heightTravel(copy);
-  saveBmp("second.bmp", second);
   bitmap *fusion = merge(first, second);
-  saveBmp("fusion.bmp", fusion);
 
   queue *histoQueue = newQueue();
   color *content = malloc(sizeof(color) * src->width * src->height);
@@ -528,13 +521,10 @@ bitmap *rlsa(bitmap *src, queue *imgQueue, queue *posQueue)
   while (cpt < imgQueue->length)
   {
     bitmap *cutedImage = deQueue(imgQueue);
-    saveBmp("test.bmp", cutedImage);
     unsigned *pos = deQueue(posQueue);
-
     float hm[1] = {0};
     textToHisto(histoQueue, cutedImage, src, hm, *pos);
     histoToImage(final, src, histoQueue, hm);
-
     enQueue(imgQueue, cutedImage);
     enQueue(posQueue, pos);
     cpt++;
