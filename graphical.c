@@ -21,27 +21,12 @@ typedef struct
 	char *path;
 }Zone;
 
-char *ascii_to_utf8(unsigned char c)
-{
-	unsigned char *out;
-	
-	if(c < 128)
-	{
-		out = (char *)calloc(2, sizeof(char));
-		out[0] = c;
-		out[1] = '\0';
-	}
-	else
-	{
-		out = (char *)calloc(3, sizeof(char));
-		out[1] = (c >> 6) | 0xC0;
-		out[0] = (c & 0x3F) | 0x80;
-		out[2] = '\0';
-	}
-	
-	return out;
-}
-
+/**
+ * \brief Process the optical recognition of character algorithm on thechosen picture
+ *
+ * \param window The parent window
+ * \param data The pointer to the created zone struct
+ */
 void process(GtkWidget *window, gpointer data){
 	network *n = loadNetwork("network.save");
 	Zone *zone = (Zone *)data;
@@ -54,6 +39,7 @@ void process(GtkWidget *window, gpointer data){
 	int i = 0;
 	char txt[*length + 1];
 	txt[*length] = 0;
+	char c;
 	while (q->length > 0)
 	{
 		queue *line = deQueue(q);
@@ -67,7 +53,14 @@ void process(GtkWidget *window, gpointer data){
 				//autoContrast(letter);
 				binarize(letter);
 				draw(letter);
-				txt[i] = ocr(letter, n);
+				c = ocr(letter, n);
+				if(c > 127){
+					txt[i] = (c & 0x3F) | 0x80;
+					i++;
+					txt[i] = (c >> 6) | 0xC0;
+				}
+				else
+					txt[i] = c;
 				freeBitmap(letter);
 				i++;
 			}
@@ -79,8 +72,6 @@ void process(GtkWidget *window, gpointer data){
 		txt[i] = '\n';
 		i++;
     }
-		GError *error = NULL;
-	  g_convert(txt, i, "UTF-8", "ANSI X3.4:1986",  NULL, NULL, &error)	;
 		GtkTextBuffer *textBuffer = NULL;
 		textBuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(zone->text));
 		gtk_text_buffer_set_text(textBuffer, txt, i);
@@ -91,6 +82,12 @@ void process(GtkWidget *window, gpointer data){
     freeNetwork(n);
 }
 
+/**
+ * \brief Save the file at the location chosen by the user
+ * 
+ * \param window The parent window
+ * \param data The pointer to the created zone struct
+ */
 void saveFile(GtkWidget *window, gpointer data){
 	Zone *zone = (Zone*)data;
   GtkWidget *topLevel = NULL;
@@ -148,6 +145,12 @@ void saveFile(GtkWidget *window, gpointer data){
 	(void)window;
 }
 
+/**
+ * \brief Return the path of a file chosen by the user
+ *
+ * \param widget The parent window
+ * \param data The pointer to the created zone struct
+ */
 void fileChoose(GtkWidget *widget, gpointer data)
 {
   Zone *zone = (Zone*)data;
@@ -173,6 +176,13 @@ void fileChoose(GtkWidget *widget, gpointer data)
 	(void)widget;
   zone->path = fileName;
 }
+
+/**
+ * \brief Open the file chosen by the user. Must be a image type file.
+ *
+ * \param widget The parent window
+ * \param data The pointer to the created zone struct
+ */
 void cbOpen(GtkWidget *widget, gpointer data)
 {
   Zone *zone = (Zone*)data;
@@ -203,8 +213,12 @@ void cbOpen(GtkWidget *widget, gpointer data)
 	(void)widget;
 }
 
-/* Create a dialog that make the user confirm if he really 
-wants to quit the program*/
+/**
+ * \brief Create a dialog that make the user confirm if he really wants to quit the program
+ * 
+ * \param widget The parent window
+ * \param data The pointer to the created zone struct
+ */
 void leaveDialog(GtkWidget *widget, gpointer data)
 {
 	Zone *zone = (Zone*)data;
@@ -233,6 +247,12 @@ void leaveDialog(GtkWidget *widget, gpointer data)
 	gtk_widget_destroy(pQuestion);
 }
 
+/**
+ * \brief Create the parent window, the menus, the zones, ...
+ * 
+ * \param argc The argc parameter of the main fuction
+ * \param argv The argv parameter of the main fuction
+ */
 int start(int argc, char **argv)
 {
  
@@ -380,8 +400,6 @@ int start(int argc, char **argv)
   gtk_box_pack_end(GTK_BOX(mainBox), mainZone, TRUE, TRUE, 0);
 
 	gtk_widget_show_all(mainWindow);
-	//g_signal_connect(G_OBJECT(pButton[3]), "clicked",
-    //               G_CALLBACK(learning), zone);
 	gtk_main();
   return EXIT_SUCCESS;
 }
