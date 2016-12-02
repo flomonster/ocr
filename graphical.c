@@ -1,3 +1,14 @@
+/**
+ * \file graphical.c
+ * \brief Create the graphical interface and call the function
+ * \author decret_t
+ * \date October 19th 2016
+ *
+ * Generate the graphical user interface (GUI) and link all the 
+ * buttons with the functions to launch. 
+ */
+
+
 # include <stdio.h>
 # include <stdlib.h>
 # include <err.h>
@@ -134,9 +145,9 @@ void process(GtkWidget *window, gpointer data){
 	gtk_dialog_run(GTK_DIALOG(messageDialog));
 	gtk_image_set_from_file(GTK_IMAGE(zone->image), "fusion.bmp");
 	gtk_dialog_run(GTK_DIALOG(messageDialog));
-	gtk_image_set_from_file(GTK_IMAGE(zone->image), "fusion.bmp");
+	gtk_image_set_from_file(GTK_IMAGE(zone->image), "rlsaImage.bmp");
 	gtk_dialog_run(GTK_DIALOG(messageDialog));
-	gtk_image_set_from_file(GTK_IMAGE(zone->image), "fusion.bmp");
+	gtk_image_set_from_file(GTK_IMAGE(zone->image), "segmented.bmp");
 	gtk_dialog_run(GTK_DIALOG(messageDialog));
 	while (q->length > 0)
 	{
