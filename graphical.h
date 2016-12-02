@@ -1,3 +1,13 @@
+/**
+ * \file graphical.h
+ * \brief Create the graphical interface and call the function
+ * \author decret_t
+ * \date October 19th 2016
+ *
+ * Generate the graphical user interface (GUI) and link all the 
+ * buttons with the functions to launch. 
+ */
+
 # ifndef GRAPHICAL_H_INCLUDED
 # define GRAPHICAL_H_INCLUDED
 
