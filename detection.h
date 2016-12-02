@@ -11,10 +11,6 @@ void putLineMarker(bitmap *, char *, int, unsigned);
 
 void putColumnMarker(bitmap *, unsigned, unsigned, char *, int, unsigned);
 
-void checBlackLine(bitmap *, char *);
-
-void checBlackColumn(bitmap *, char *, unsigned, unsigned);
-
 bitmap *cutBmp(bitmap *, unsigned, unsigned, unsigned, unsigned);
 
 float letterAverage(char *, unsigned);
