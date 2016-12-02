@@ -21,6 +21,73 @@ typedef struct
 	char *path;
 }Zone;
 
+double a2i(const char *s)
+{
+ 	double sign=1;
+ 	if(*s == '-'){
+ 		sign = -1;
+ 		s++;
+	}
+	double div = 1;
+	else if(*s == '+')
+		s++;
+ 	double num=0;
+ 	while(*s && *s != '.')
+  {
+   	num=((*s)-'0')+num*10;
+    s++;   
+  }
+	if(*s)
+		s++;
+	while(*s)
+  {
+    num=((*s)-'0')+num*10;
+		div *= 10;
+    s++;
+  }
+ 	return num*sign / div;
+}
+
+void rotation(GtkWidget *window, gpointer data){
+	Zone *zone = (Zone *)data;
+	GtkWidget *pWindow = zone->pWindow;
+	GtkWidget* pBox;
+  GtkWidget* pEntry;
+  const gchar* angle;
+  pBox = gtk_dialog_new_with_buttons("Choose rotation angle",
+      GTK_WINDOW(pWindow),
+      GTK_DIALOG_MODAL,
+      GTK_STOCK_OK,GTK_RESPONSE_OK,
+      GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
+      NULL);
+ 
+  pEntry = gtk_entry_new();
+  gtk_entry_set_text(GTK_ENTRY(pEntry), "0");
+  GtkWidget *vBox = gtk_dialog_get_content_area(GTK_DIALOG(pBox));
+	gtk_box_pack_start(GTK_BOX(vBox), pEntry, TRUE, FALSE, 0);
+  
+	gtk_widget_show_all(vBox);
+  switch (gtk_dialog_run(GTK_DIALOG(pBox)))
+  {
+      case GTK_RESPONSE_OK:
+          angle = gtk_entry_get_text(GTK_ENTRY(pEntry));
+					double ang = a2i(angle);
+					bitmap *img = loadBmp(zone->path);
+					rotate(img, angle);
+					char *path = "pictureRotate.bmp";
+					saveBmp(path, img);
+					gtk_image_set_from_file(GTK_IMAGE(zone->image), path);
+					free(path);
+          break;
+      /* L utilisateur annule */
+      case GTK_RESPONSE_CANCEL:
+					break;
+  }
+	gtk_widget_destroy(pBox);
+	free(angle)
+	(void)window;
+}
+
 /**
  * \brief Process the optical recognition of character algorithm on thechosen picture
  *
@@ -80,6 +147,7 @@ void process(GtkWidget *window, gpointer data){
     free(q);
     freeBitmap(img);
     freeNetwork(n);
+		(void)window;
 }
 
 /**
@@ -328,6 +396,9 @@ int start(int argc, char **argv)
        G_CALLBACK(fileChoose), zone);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuItem);
 
+	menuItem = gtk_menu_item_new_with_label("Rotate");
+  g_signal_connect(G_OBJECT(menuItem), "activate", G_CALLBACK(rotation), zone);
+  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuItem);
 
   /*Submenu*/
   menuItem = gtk_menu_item_new_with_label("Edit");
