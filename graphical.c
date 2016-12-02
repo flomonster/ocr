@@ -13,22 +13,33 @@
 /* Create a dialog that allows the user to choose a file to open.
 Once the file is open, launch the ocr algorithm on it */
 
+
+/**
+ *\struct Zone
+ *\brief Struct that contains all the info of the graphical interface
+ *
+*/
 typedef struct
 {
-  GtkWidget *image;
-  GtkWidget *text;
-  GtkWidget *pWindow;
-	char *path;
+  GtkWidget *image; /* !< The current image */
+  GtkWidget *text;  /* !< The text currently displayed */
+  GtkWidget *pWindow; /* !< The parent window, the first one created */
+	char *path; /* !< The path of the image to be processed */
 }Zone;
 
+/**
+ *\brief Convert a constant string to a double
+ *
+ *\param s The constant string to convert
+*/
 double a2i(const char *s)
 {
  	double sign=1;
+	double div = 1;
  	if(*s == '-'){
  		sign = -1;
  		s++;
 	}
-	double div = 1;
 	else if(*s == '+')
 		s++;
  	double num=0;
@@ -48,12 +59,18 @@ double a2i(const char *s)
  	return num*sign / div;
 }
 
+/**
+ *\brief Launch the rotation on the current image
+ *
+ *\param window The current parent window
+ *\param data The pointer to the Zone
+*/
 void rotation(GtkWidget *window, gpointer data){
 	Zone *zone = (Zone *)data;
 	GtkWidget *pWindow = zone->pWindow;
 	GtkWidget* pBox;
   GtkWidget* pEntry;
-  const gchar* angle;
+  const char* angle;
   pBox = gtk_dialog_new_with_buttons("Choose rotation angle",
       GTK_WINDOW(pWindow),
       GTK_DIALOG_MODAL,
@@ -73,23 +90,24 @@ void rotation(GtkWidget *window, gpointer data){
           angle = gtk_entry_get_text(GTK_ENTRY(pEntry));
 					double ang = a2i(angle);
 					bitmap *img = loadBmp(zone->path);
-					rotate(img, angle);
+					//rotate(img, ang);
 					char *path = "pictureRotate.bmp";
 					saveBmp(path, img);
 					gtk_image_set_from_file(GTK_IMAGE(zone->image), path);
 					free(path);
+					free(angle);
           break;
       /* L utilisateur annule */
       case GTK_RESPONSE_CANCEL:
 					break;
   }
 	gtk_widget_destroy(pBox);
-	free(angle)
 	(void)window;
 }
 
 /**
- * \brief Process the optical recognition of character algorithm on thechosen picture
+ * \brief Process the optical recognition of character algorithm on the chosen
+ * picture
  *
  * \param window The parent window
  * \param data The pointer to the created zone struct
@@ -107,6 +125,19 @@ void process(GtkWidget *window, gpointer data){
 	char txt[*length + 1];
 	txt[*length] = 0;
 	char c;
+	GtkWidget *messageDialog = gtk_message_dialog_new(GTK_WINDOW(zone->pWindow),
+									GTK_DIALOG_MODAL, GTK_MESSAGE_INFO,
+									GTK_BUTTONS_CLOSE, 
+"Here is the new image.\n Please click to proceed to next step.");
+	g_signal_connect_swapped(messageDialog, "response", 
+									G_CALLBACK(gtk_widget_destroy), messageDialog);
+	gtk_dialog_run(GTK_DIALOG(messageDialog));
+	gtk_image_set_from_file(GTK_IMAGE(zone->image), "fusion.bmp");
+	gtk_dialog_run(GTK_DIALOG(messageDialog));
+	gtk_image_set_from_file(GTK_IMAGE(zone->image), "fusion.bmp");
+	gtk_dialog_run(GTK_DIALOG(messageDialog));
+	gtk_image_set_from_file(GTK_IMAGE(zone->image), "fusion.bmp");
+	gtk_dialog_run(GTK_DIALOG(messageDialog));
 	while (q->length > 0)
 	{
 		queue *line = deQueue(q);
@@ -282,7 +313,8 @@ void cbOpen(GtkWidget *widget, gpointer data)
 }
 
 /**
- * \brief Create a dialog that make the user confirm if he really wants to quit the program
+ * \brief Create a dialog that make the user confirm if he really wants to quit
+ * the program
  * 
  * \param widget The parent window
  * \param data The pointer to the created zone struct
@@ -313,6 +345,7 @@ void leaveDialog(GtkWidget *widget, gpointer data)
           break;
     }
 	gtk_widget_destroy(pQuestion);
+	(void)widget;
 }
 
 /**
