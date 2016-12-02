@@ -1,16 +1,26 @@
+/**
+ * \file main.c
+ * \brief Detect text and only it in a text 
+ * \author issarn_t
+ * \date 09/17/2016
+ */
 # include <err.h>
 # include "bitmap.h"
 # include "queue.h"
 # include "detection.h"
 
+/**
+ * \struct s_histogram
+ * \brief All information on a text block is in
+ */
 struct s_histogram
 {
-  unsigned x;
-  unsigned y;
-  unsigned deltaX;
-  unsigned deltaY;
-  unsigned dc;
-  unsigned tc;
+  unsigned x; /*!< min x pos of the block */
+  unsigned y; /*!< min y pos of the block */
+  unsigned deltaX; /*!< width of the block */
+  unsigned deltaY; /*!< height of the block */
+  unsigned dc; /*!< number of black pixel in the block */
+  unsigned tc; /*!< number of dif between the original and the rlsa block */
 };
 typedef struct s_histogram histogram;
 
@@ -34,6 +44,8 @@ bitmap *binerizeCopy(bitmap *src)
  *
  * \param img the full image
  * \param array where marker is put in function of the img
+ * \param pos the x min pos in the original image
+ * \param width the width of the cuted Image
  */
 void putLineMarker(bitmap *img, char *array, int pos, unsigned width)
 {
@@ -50,9 +62,11 @@ void putLineMarker(bitmap *img, char *array, int pos, unsigned width)
  * \brief Put a marker for each column with a letter
  *
  * \param img one line of the full image
- * \param min X min
- * \param max X max
- * \param array where marker is put in function of the img *
+ * \param min x min
+ * \param max x max
+ * \param array where marker is put in function of the img 
+ * \param pos the x min pos in the original image
+ * \param width the width of the cuted Image
  */
 void putColumnMarker(bitmap *img, unsigned min, unsigned max, char *array,
     int pos, unsigned width)
@@ -66,6 +80,16 @@ void putColumnMarker(bitmap *img, unsigned min, unsigned max, char *array,
   }
 }
 
+
+/**
+ * \brief Put a marker for each column with a letter
+ *
+ * \param img the full image  
+ * \param min x min
+ * \param max y min
+ * \param width the width of the cuted Image
+ * \param height the height of the image 
+ */
 bitmap *cutBmp(bitmap *img, unsigned x, unsigned y,
     unsigned width, unsigned height)
 {
@@ -107,6 +131,15 @@ float letterAverage(char *columnMarker, unsigned width)
   return !nbLetter ? 0 : sumWidthLetter / nbLetter;
 }
 
+/**
+ * \brief frame a rectangle
+ *
+ * \param img the full image  
+ * \param min x min
+ * \param max y min
+ * \param width the width of the rectangle
+ * \param height the height of the rectangle
+ * */
 void colorRectangle(bitmap *src, int x, int y, unsigned width, 
     unsigned height)
 {
@@ -125,9 +158,14 @@ void colorRectangle(bitmap *src, int x, int y, unsigned width,
 }
 
 /**
- * \brierepeats 119 times>, f Create a queue with all letter in a bitmap
+ * \brief Create a queue with all letter in a bitmap
  *
  * \param img the full image
+ * \param nbCharacter the number of character in the image
+ * \param nbLetter the number of letter int the image
+ * \param q is the queue where is stocked all letter 
+ * \param cutedImage is the the image that we use 
+ * \param pos is the x min
  */
 void segmentation(bitmap *img, size_t *nbCharacter,
     size_t *nbLetter, queue *q, bitmap *cutedImage, int pos)
@@ -366,10 +404,10 @@ void columnCut(bitmap *src, queue *imgQueue, queue *posQueue)
 /**
  * \brief make the histogram of one block and add it in a queue
  *
- * \param bmp is the block repeats 119 times>, 
+ * \param bmp is the text block  
  * \param original is copy binarize of the original image 
- * \param X higth left corner of the block on the copy in abscisse 
- * \param Y higth left corner of the block on the copy in ordonate
+ * \param x higth left corner of the block on the copy in abscisse 
+ * \param y higth left corner of the block on the copy in ordonate
  * \param q is the queue where we add the hsitogram
  */
 void makeHistogram(bitmap *bmp, bitmap *original, unsigned x, unsigned y,
@@ -398,8 +436,12 @@ void makeHistogram(bitmap *bmp, bitmap *original, unsigned x, unsigned y,
 /**
  * \brief Return an image without black line et draw
  *
- * \param src the original image
- */
+ * \param histoQueue is the queue with all histogram of a image
+ * \param src the cuted image
+ * \param original is the original image
+ * \param hm is the height average of text block
+ * \param pos is the x min pos 
+ * */
 void textToHisto(queue *histoQueue, bitmap *src, bitmap *original,
     float *hm, unsigned pos) 
 {
@@ -451,9 +493,10 @@ void textToHisto(queue *histoQueue, bitmap *src, bitmap *original,
 /**
  * \brief make image from a queue of histogram
  *
+ * \param final is the image that we modify
  * \param src is the original image
- * \histoQueue is the queue with contain all histograms
- * \hm is the average height of block in the image 
+ * \param histoQueue is the queue with contain all histograms
+ * \param hm is the average height of block in the image
  */
 void histoToImage(bitmap *final, bitmap *src, queue *histoQueue, float *hm)
 {
@@ -471,9 +514,11 @@ void histoToImage(bitmap *final, bitmap *src, queue *histoQueue, float *hm)
 }
 
 /**
- * \brief return a image with line and draw
+ * \brief return a image without line and draw
  *
- * \param src is the orignal image
+ * \param src is the original image
+ * \param imgQueue is the queue where we stock images
+ * \param posQueue is the queue where we stock x min position of each images
  */
 bitmap *rlsa(bitmap *src, queue *imgQueue, queue *posQueue)
 {
@@ -508,7 +553,14 @@ bitmap *rlsa(bitmap *src, queue *imgQueue, queue *posQueue)
   return final;
 }
 
-queue *doTheThings(bitmap * src, size_t * nbCharacter, size_t * nbLetter)
+/**
+ * \brief return a queue which contain all letter 
+ *
+ * \param src is the original image
+ * \param nbCharacter is the number of character
+ * \param nbLetter is the number of letter
+ */
+queue *detectText(bitmap * src, size_t * nbCharacter, size_t * nbLetter)
 {
   queue *posQueue = newQueue();
   queue *imgQueue = newQueue();
