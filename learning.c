@@ -179,6 +179,7 @@ int createSamples(queue *text, float **samples)
       {
         bitmap *letter = deQueue(word);
         resize(letter);
+        autoContrast(letter);
         binarize(letter);
         *samples = malloc(sizeof(float) * 256);
         for (int i = 0; i < 256; i++)
@@ -203,7 +204,7 @@ int createSamples(queue *text, float **samples)
  */
 float **createResults(char text[], int nbSample)
 {
-  size_t nbOutput = 95;
+  size_t nbOutput = 93;
   float **results = malloc(sizeof(float *) * nbSample);
   for (int i = 0; i < nbSample; i++)
   {

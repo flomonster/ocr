@@ -6,9 +6,9 @@
 # include "network.h"
 # include "ocr.h"
 
-char characters[95] = 
+char characters[93] = 
 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQR"
-"STUVWXYZ0123456789.,?!_-&\"#{([|\'\\@)]°}+=$%*;/:<>";
+"STUVWXYZ0123456789.,?!_-&#{([|\'\\@)]}+=$%*;/:<>";
 
 /**
  * \brief Sigmoid function
