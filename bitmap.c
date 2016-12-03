@@ -223,8 +223,8 @@ bitmap *loadBmp(char *path)
 /*
  * \brief save the bmp with the path name
  *
- * \param img : the bitmap
- * \param path the name of the saved bmp
+ * \param img the picture that we want to save
+ * \param path the name for the saved picture
 */
 
 void saveBmp(char *path, bitmap *bmp)
@@ -257,7 +257,7 @@ void saveBmp(char *path, bitmap *bmp)
 /*
  * \brief Equalize the histogram of the bitmap to raise the contrast
  *
- * \param img : the bitmap
+ * \param img the bitmap
 */
 void autoContrast(bitmap *img)
 {
@@ -323,7 +323,7 @@ void autoContrast(bitmap *img)
 /*
  * \brief rotate the bmp by angle degree
  *
- * \param ing the bmp to rotate
+ * \param img the picture to rotate
  * \param angle the angle of the rotation, in degree
  */
 
