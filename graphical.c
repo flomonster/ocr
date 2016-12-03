@@ -101,12 +101,11 @@ void rotation(GtkWidget *window, gpointer data){
           angle = gtk_entry_get_text(GTK_ENTRY(pEntry));
 					double ang = a2i(angle);
 					bitmap *img = loadBmp(zone->path);
-					//rotate(img, ang);
+					rotate(img, ang);
 					char *path = "pictureRotate.bmp";
 					saveBmp(path, img);
 					gtk_image_set_from_file(GTK_IMAGE(zone->image), path);
 					free(path);
-					free(angle);
           break;
       /* L utilisateur annule */
       case GTK_RESPONSE_CANCEL:
@@ -131,11 +130,12 @@ void process(GtkWidget *window, gpointer data){
 	//draw(img);
 	size_t *length = malloc(sizeof(size_t));
 	size_t *useless = malloc(sizeof(size_t));
-	queue *q = segmentation(img, useless, length);
+	queue *q = detectText(img, useless, length);
 	int i = 0;
 	char txt[*length + 1];
 	txt[*length] = 0;
 	char c;
+	printf("OK");
 	GtkWidget *messageDialog = gtk_message_dialog_new(GTK_WINDOW(zone->pWindow),
 									GTK_DIALOG_MODAL, GTK_MESSAGE_INFO,
 									GTK_BUTTONS_CLOSE, 
@@ -143,9 +143,23 @@ void process(GtkWidget *window, gpointer data){
 	g_signal_connect_swapped(messageDialog, "response", 
 									G_CALLBACK(gtk_widget_destroy), messageDialog);
 	gtk_dialog_run(GTK_DIALOG(messageDialog));
+	printf("OK BOX");
 	gtk_image_set_from_file(GTK_IMAGE(zone->image), "fusion.bmp");
+	printf("OK LOAD");
+	messageDialog = gtk_message_dialog_new(GTK_WINDOW(zone->pWindow),
+                  GTK_DIALOG_MODAL, GTK_MESSAGE_INFO,
+                  GTK_BUTTONS_CLOSE,
+"Here is the new image.\n Please click to proceed to next step.");
+  g_signal_connect_swapped(messageDialog, "response",
+                  G_CALLBACK(gtk_widget_destroy), messageDialog);
 	gtk_dialog_run(GTK_DIALOG(messageDialog));
 	gtk_image_set_from_file(GTK_IMAGE(zone->image), "rlsaImage.bmp");
+	messageDialog = gtk_message_dialog_new(GTK_WINDOW(zone->pWindow),
+                  GTK_DIALOG_MODAL, GTK_MESSAGE_INFO,
+                  GTK_BUTTONS_CLOSE,
+"Here is the new image.\n Please click to proceed to next step.");
+  g_signal_connect_swapped(messageDialog, "response",
+                  G_CALLBACK(gtk_widget_destroy), messageDialog);
 	gtk_dialog_run(GTK_DIALOG(messageDialog));
 	gtk_image_set_from_file(GTK_IMAGE(zone->image), "segmented.bmp");
 	gtk_dialog_run(GTK_DIALOG(messageDialog));
@@ -159,7 +173,7 @@ void process(GtkWidget *window, gpointer data){
 			{
 				bitmap *letter = deQueue(word);
 				resize(letter);
-				//autoContrast(letter);
+				autoContrast(letter);
 				binarize(letter);
 				draw(letter);
 				c = ocr(letter, n);
@@ -473,19 +487,6 @@ int start(int argc, char **argv)
 	GtkWidget *toolBar = gtk_toolbar_new();
   gtk_box_pack_start(GTK_BOX(mainBox), toolBar, FALSE, FALSE, 0);
 	
-	GtkButton *op = GTK_BUTTON(gtk_button_new_with_mnemonic("_Open"));
-	g_signal_connect(op, "clicked", G_CALLBACK(cbOpen), zone);
-  gtk_toolbar_insert(GTK_TOOLBAR(toolBar), GTK_TOOL_ITEM(op), -1);
-	GtkButton *sf = GTK_BUTTON(gtk_button_new_with_mnemonic("_Save"));
-  g_signal_connect(op, "clicked", G_CALLBACK(cbOpen), zone);
-  gtk_toolbar_insert(GTK_TOOLBAR(toolBar), GTK_TOOL_ITEM(sf), -1);
-	GtkButton *ex = GTK_BUTTON(gtk_button_new_with_mnemonic("_Execute"));
-  g_signal_connect(op, "clicked", G_CALLBACK(cbOpen), zone);
-  gtk_toolbar_insert(GTK_TOOLBAR(toolBar), GTK_TOOL_ITEM(ex), -1);
-	GtkButton *qu = GTK_BUTTON(gtk_button_new_with_mnemonic("_Quit"));
-  g_signal_connect(op, "clicked", G_CALLBACK(cbOpen), zone);
-  gtk_toolbar_insert(GTK_TOOLBAR(toolBar), GTK_TOOL_ITEM(qu), -1);
-  gtk_toolbar_set_style(GTK_TOOLBAR(toolBar), GTK_TOOLBAR_ICONS);
 	
 	GtkWidget *mainZone = NULL;
   mainZone = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
