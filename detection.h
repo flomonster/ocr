@@ -1,3 +1,9 @@
+/**
+ * \file detection.h 
+ * \brief Detect text and only it in a image
+ * \author issarn_t
+ * \date 09/17/2016
+ */
 # ifndef DETECTION_H_DEFINED
 # define DETECTION_H_DEFINED
 # include <stdio.h>
@@ -5,34 +11,25 @@
 # include "bitmap.h"
 # include "queue.h"
 
-bitmap *binerizeCopy(bitmap *);
+/**
+ * \brief return a queue which contain all letter 
+ *
+ * \param src is the original image
+ * \param nbCharacter is the number of character
+ * \param nbLetter is the number of letter
+ */
+queue *detectText(bitmap *, size_t *, size_t *);
 
-void putLineMarker(bitmap *, char *);
-
-void putColumnMarker(bitmap *, unsigned, unsigned, char *);
-
-void checBlackLine(bitmap *, char *);
-
-void checBlackColumn(bitmap *, char *, unsigned, unsigned);
-
-bitmap *cutBmp(bitmap *, unsigned, unsigned, unsigned, unsigned);
-
-float letterAverage(char *, unsigned);
-
-queue *segmentation(bitmap *, size_t *, size_t *);
-
-bitmap *widthTravel(bitmap *);
-
-bitmap *heightTravel(bitmap *);
-
-bitmap *merge(bitmap *, bitmap *);
-
-void makeHistogram(bitmap *, bitmap *, unsigned, unsigned, queue *);
-
-queue *textToHisto(bitmap *, bitmap *, float *);
-
-bitmap *histoToImage(bitmap *, queue *, float *);
-
-bitmap *rlsa(bitmap *);
+/**
+ * \brief Create a queue with all letter in a bitmap
+ *
+ * \param img the full image
+ * \param nbCharacter the number of character in the image
+ * \param nbLetter the number of letter int the image
+ * \param q is the queue where is stocked all letter 
+ * \param cutedImage is the the image that we use 
+ * \param pos is the x min
+ */
+void segmentation(bitmap *, size_t *, size_t *, queue *, bitmap *, int);
 
 # endif

@@ -100,8 +100,11 @@ void learning(char *learnFiles[], size_t nbFile)
     } while (pathImg[i-1] != '\n');
     pathImg[i-1] = 0;
     fclose(fp);
+    
     bitmap *img = loadBmp(pathImg);
-    enQueue(segmented, segmentation(img, nbCharacter, useless));
+    queue * segmentedImg = newQueue();
+    segmentation(img, nbCharacter, useless, segmentedImg, img, 0);
+    enQueue(segmented, segmentedImg);
     freeBitmap(img);
     length += *nbCharacter;
   }
@@ -177,6 +180,7 @@ int createSamples(queue *text, float **samples)
       {
         bitmap *letter = deQueue(word);
         resize(letter);
+        autoContrast(letter);
         binarize(letter);
         *samples = malloc(sizeof(float) * 256);
         for (int i = 0; i < 256; i++)
@@ -201,7 +205,7 @@ int createSamples(queue *text, float **samples)
  */
 float **createResults(char text[], int nbSample)
 {
-  size_t nbOutput = 95;
+  size_t nbOutput = 93;
   float **results = malloc(sizeof(float *) * nbSample);
   for (int i = 0; i < nbSample; i++)
   {

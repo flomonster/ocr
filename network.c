@@ -168,7 +168,7 @@ void generateNetwork()
   unsigned *layers = malloc(sizeof(unsigned) * 3);
   layers[0] = 256;
   layers[1] = 80;
-  layers[2] = 95;
+  layers[2] = 93;
   network *n = newNetwork(3, layers);
 
   printf("Generating the network :\n");
