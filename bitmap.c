@@ -2,6 +2,7 @@
 # include <stdlib.h>
 # include <stdint.h>
 # include <err.h>
+# include <math.h>
 # include "bitmap.h"
 
 # pragma pack(push, 1)
@@ -296,4 +297,37 @@ void autoContrast(bitmap *img)
   free(histoRC);
   free(histoGC);
   free(histoBC);
+}
+
+void rotate(bitmap *img, double angle)
+{
+  // angle to rad
+  angle *= 0.0174533; 
+
+  unsigned n = img->width * img->height;
+  color *content = malloc(sizeof (color) * n);
+  unsigned x, y;
+  double x2, y2;
+  for (unsigned i = 0; i < n; i++)
+  {
+    content[i].r = 255;
+    content[i].g = 255;
+    content[i].b = 255;
+  }
+  for (unsigned i = 0; i < n; i++)
+  {
+    x = i % img->width;
+    y = (i - x) / img->width;
+    x2 = cos(angle) * (double)x + sin(angle) * (double)y;
+    y2 = - sin(angle) * (double)x + cos(angle) * (double)y;
+    if (x2 >= 0 && x2 < (double)img->width)
+    {
+      if (y2 >= 0 && y2 < (double)img->height)
+      {
+        content[(unsigned)y2 * img->width + (unsigned)x2] = img->content[i];
+      }
+    }
+  }
+  free(img->content);
+  img->content = content;
 }

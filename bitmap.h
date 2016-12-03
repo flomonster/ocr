@@ -47,4 +47,5 @@ void saveBmp(char *, bitmap *);
 
 void autoContrast(bitmap *img);
 
+void rotate(bitmap *img, double angle);
 # endif
