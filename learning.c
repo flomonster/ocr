@@ -102,7 +102,8 @@ void learning(char *learnFiles[], size_t nbFile)
     fclose(fp);
     
     bitmap *img = loadBmp(pathImg);
-    queue * segmentedImg = detectText(img, nbCharacter, useless);
+    queue * segmentedImg = newQueue();
+    segmentation(img, nbCharacter, useless, segmentedImg, img, 0);
     enQueue(segmented, segmentedImg);
     freeBitmap(img);
     length += *nbCharacter;
