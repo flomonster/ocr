@@ -1,7 +1,16 @@
+/**
+ * \file bitmap.c
+ * \brief Structs and fonctions on bitmap
+ * \author astain_d and issarn_t
+ * \date 10/04/2016
+ *
+ */
+
 # include <stdio.h>
 # include <stdlib.h>
 # include <stdint.h>
 # include <err.h>
+# include <math.h>
 # include "bitmap.h"
 
 # pragma pack(push, 1)
@@ -65,6 +74,12 @@ bitmap *newBitmap(unsigned width, unsigned height, color *content)
   img->content = content;
   return img;
 }
+
+/**
+ * \brief free the bitmap
+ *
+ * \param img the bitmap to free
+ */
 
 void freeBitmap(bitmap *img)
 {
@@ -205,6 +220,13 @@ bitmap *loadBmp(char *path)
   return bmp;
 }
 
+/*
+ * \brief save the bmp with the path name
+ *
+ * \param img the picture that we want to save
+ * \param path the name for the saved picture
+*/
+
 void saveBmp(char *path, bitmap *bmp)
 {
   FILE *fp = fopen(path, "w+");
@@ -235,7 +257,7 @@ void saveBmp(char *path, bitmap *bmp)
 /*
  * \brief Equalize the histogram of the bitmap to raise the contrast
  *
- * \param bitmap *img : the bitmap
+ * \param img the bitmap
 */
 void autoContrast(bitmap *img)
 {
@@ -296,4 +318,49 @@ void autoContrast(bitmap *img)
   free(histoRC);
   free(histoGC);
   free(histoBC);
+}
+
+/*
+ * \brief rotate the bmp by angle degree
+ *
+ * \param img the picture to rotate
+ * \param angle the angle of the rotation, in degree
+ */
+
+void rotate(bitmap *img, double angle)
+{
+  // angle to rad
+  angle *= 0.0174533; 
+
+  unsigned n = img->width * img->height;
+  color *content = malloc(sizeof (color) * n);
+  unsigned x, y;
+  double x2, y2;
+  for (unsigned i = 0; i < n; i++)
+  {
+    content[i].r = 255;
+    content[i].g = 255;
+    content[i].b = 255;
+  }
+  for (unsigned i = 0; i < n; i++)
+  {
+    x = i % img->width;
+    y = (i - x) / img->width;
+    x2 = cos(angle) * ((double)x - (double)img->width / 2);
+    x2 +=  sin(angle) * ((double)y - (double)img->height / 2); 
+    x2 += (double)img->width / 2;
+    y2 = - sin(angle) * ((double)x  - (double)img->width / 2);
+    y2 += cos(angle) * ((double)y - (double)img->height / 2);
+    y2 += (double)img->height / 2;
+
+    if (x2 >= 0 && x2 < (double)img->width)
+    {
+      if (y2 >= 0 && y2 < (double)img->height)
+      {
+        content[(unsigned)y2 * img->width + (unsigned)x2] = img->content[i];
+      }
+    }
+  }
+  free(img->content);
+  img->content = content;
 }
