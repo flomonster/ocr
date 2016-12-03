@@ -34,6 +34,8 @@ int main(int argc, char *argv[])
     network *n = loadNetwork("network.save");
 
     bitmap *img = loadBmp(argv[2]);
+    rotate(img, -5);
+    saveBmp("rotate.bmp", img);
     //draw(img);
     size_t *length = malloc(sizeof(size_t));
     size_t *useless = malloc(sizeof(size_t));
