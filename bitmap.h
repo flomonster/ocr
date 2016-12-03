@@ -58,7 +58,7 @@ bitmap *newBitmap(unsigned, unsigned, color *);
 /**
  * \brief free the bitmap
  *
- * \param bitmap *img the bitmap to free
+ * \param img the bitmap to free
  */
 
 void freeBitmap(bitmap *);
@@ -104,8 +104,8 @@ bitmap *loadBmp(char *);
 /**
  * \brief save the bmp with the path name
  *
- * \param bitmap *img : the bitmap
- * \param char *path the name of the saved bmp
+ * \param img the bitmap
+ * \param path the name of the saved bmp
  */
 
 void saveBmp(char *, bitmap *);
@@ -113,7 +113,7 @@ void saveBmp(char *, bitmap *);
 /**
  * \brief Equalize the histogram of the bitmap to raise the contrast
  *
- * \param bitmap *img : the bitmap
+ * \param img the bitmap
  */
 
 void autoContrast(bitmap *img);
@@ -121,8 +121,8 @@ void autoContrast(bitmap *img);
 /**
  * \brief rotate the bmp by angle degree
  *
- * \param bitmap *ing the bmp to rotate
- * \param double angle the angle of the rotation, in degree
+ * \param ing the bmp to rotate
+ * \param angle the angle of the rotation, in degree
  */
 
 void rotate(bitmap *img, double angle);
