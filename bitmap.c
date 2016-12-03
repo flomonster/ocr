@@ -78,7 +78,7 @@ bitmap *newBitmap(unsigned width, unsigned height, color *content)
 /**
  * \brief free the bitmap
  *
- * \param bitmap *img the bitmap to free
+ * \param img the bitmap to free
  */
 
 void freeBitmap(bitmap *img)
