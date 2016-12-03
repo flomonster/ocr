@@ -20,4 +20,16 @@
  */
 queue *detectText(bitmap *, size_t *, size_t *);
 
+/**
+ * \brief Create a queue with all letter in a bitmap
+ *
+ * \param img the full image
+ * \param nbCharacter the number of character in the image
+ * \param nbLetter the number of letter int the image
+ * \param q is the queue where is stocked all letter 
+ * \param cutedImage is the the image that we use 
+ * \param pos is the x min
+ */
+void segmentation(bitmap *, size_t *, size_t *, queue *, bitmap *, int);
+
 # endif
