@@ -5,6 +5,7 @@
 # include "ocr.h"
 # include "detection.h"
 # include "learning.h"
+# include "graphical.h"
 
 /**
  * \brief the main function
@@ -15,7 +16,7 @@
 int main(int argc, char *argv[])
 {
   if (argc < 2)
-    return 0;
+    return start(argc, argv);
 
   if (argv[1][0] == '0')
     generateNetwork(256, 80 , 95);
@@ -37,7 +38,7 @@ int main(int argc, char *argv[])
     //draw(img);
     size_t *length = malloc(sizeof(size_t));
     size_t *useless = malloc(sizeof(size_t));
-    queue *q = segmentation(img, useless, length);
+    queue *q = detectText(img, useless, length);
     int i = 0;
     char txt[*length + 1];
     txt[*length] = 0;
