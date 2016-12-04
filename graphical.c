@@ -99,6 +99,7 @@ void rotation(GtkWidget *window, gpointer data){
 					printf("OK ROTATE");
 					char *path = "pictureRotate.bmp";
 					saveBmp(path, img);
+					zone->path = path;
 					printf("OK SAVE");
 					gtk_image_set_from_file(GTK_IMAGE(zone->image), path);
           break;
