@@ -99,6 +99,7 @@ void rotation(GtkWidget *window, gpointer data){
 					printf("OK ROTATE");
 					char *path = "pictureRotate.bmp";
 					saveBmp(path, img);
+					//free(zone->path);
 					zone->path = path;
 					printf("OK SAVE");
 					gtk_image_set_from_file(GTK_IMAGE(zone->image), path);
@@ -283,6 +284,10 @@ void fileChoose(GtkWidget *widget, gpointer data)
   {
     fileName = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
   }
+	else{
+		gtk_widget_destroy(dialog);
+		return;
+	}
 	gtk_widget_destroy(dialog);
 	printf("Filename : %s\n", fileName);
 	char *listfiles[] = {fileName};
