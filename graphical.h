@@ -34,7 +34,7 @@ typedef struct {
  *
  *\param s The constant string to convert
 */
-double a2i(const char *s);
+double a2i(const char);
 
 /**
  *\brief Launch the rotation on the current image
@@ -42,7 +42,7 @@ double a2i(const char *s);
  *\param window The current parent window
  *\param data The pointer to the Zone
 */
-void rotation(GtkWidget *window, gpointer data);
+void rotation(GtkWidget *, gpointer);
 
 /**
  * \brief Process the optical recognition of character algorithm on the chosen
@@ -51,7 +51,7 @@ void rotation(GtkWidget *window, gpointer data);
  * \param window The parent window
  * \param data The pointer to the created zone struct
  */
-void process(GtkWidget *window, gpointer data);
+void process(GtkWidget *, gpointer);
 
 /**
  * \brief Save the file at the location chosen by the user
@@ -59,7 +59,7 @@ void process(GtkWidget *window, gpointer data);
  * \param window The parent window
  * \param data The pointer to the created zone struct
  */
-void saveFile(GtkWidget *widget, gpointer data);
+void saveFile(GtkWidget *, gpointer);
 
 /**
  * \brief Return the path of a file chosen by the user
@@ -67,7 +67,7 @@ void saveFile(GtkWidget *widget, gpointer data);
  * \param widget The parent window
  * \param data The pointer to the created zone struct
  */
-void fileChoose(GtkWidget *widget, gpointer data);
+void fileChoose(GtkWidget *, gpointer);
 
 /**
  * \brief Open the file chosen by the user. Must be a image type file.
@@ -75,7 +75,7 @@ void fileChoose(GtkWidget *widget, gpointer data);
  * \param widget The parent window
  * \param data The pointer to the created zone struct
  */
-void cbOpen(GtkWidget *widget, gpointer data);
+void cbOpen(GtkWidget *, gpointer);
 
 /**
  * \brief Create a dialog that make the user confirm if he really wants to quit
@@ -84,7 +84,7 @@ void cbOpen(GtkWidget *widget, gpointer data);
  * \param widget The parent window
  * \param data The pointer to the created zone struct
  */
-void leaveDialog(GtkWidget *widget, gpointer data);
+void leaveDialog(GtkWidget *, gpointer);
 
 /**
  * \brief Create the parent window, the menus, the zones, ...
@@ -92,6 +92,6 @@ void leaveDialog(GtkWidget *widget, gpointer data);
  * \param argc The argc parameter of the main fuction
  * \param argv The argv parameter of the main fuction
  */
-int start(int argc, char **argv);
+int start(int , char **);
 
 # endif

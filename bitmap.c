@@ -185,16 +185,18 @@ bitmap *loadBmp(char *path)
   bitmapFileHeader fileHeader;
   bitmapInfoHeader infoHeader;
   bitmap *bmp = malloc(sizeof(bitmap));
-
-  fread(&fileHeader, sizeof(bitmapFileHeader), 1, fp);
-
-  if (fileHeader.bfType != 0x4D42)
+	int r;
+	
+  r = fread(&fileHeader, sizeof(bitmapFileHeader), 1, fp);
+  if (r == 0 || fileHeader.bfType != 0x4D42)
   {
     fclose(fp);
     errx(1, "The expected file is not a .bmp");
   }
 
-  fread(&infoHeader, sizeof(bitmapInfoHeader), 1, fp);
+  r = fread(&infoHeader, sizeof(bitmapInfoHeader), 1, fp);
+	if (r == 0)
+		return NULL;
   fseek(fp, fileHeader.bfOffBytes, SEEK_SET);
 
   bmp->width = infoHeader.biWidth;
@@ -210,7 +212,9 @@ bitmap *loadBmp(char *path)
   {
     for (unsigned j = 0; j < bmp->width; j++)
     {
-      fread(&px, 3, 1, fp);
+      r = fread(&px, 3, 1, fp);
+			if (r == 0)
+				return NULL;
       bmp->content[i * bmp->width + j] = px;
     }
     fseek(fp, padding, SEEK_CUR);

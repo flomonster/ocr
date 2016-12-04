@@ -100,26 +100,35 @@ network *loadNetwork(char *path)
 {
 
   FILE *file = fopen(path, "r");
-
+	
+	int r;
   //nblayer
   unsigned nblayer;
-  fread(&nblayer, sizeof(unsigned), 1, file);
-
+  r = fread(&nblayer, sizeof(unsigned), 1, file);
+	if (r == 0)
+		return NULL;
   //*layers
   unsigned *layers = malloc(nblayer * sizeof(unsigned));
-  fread(layers, sizeof(unsigned), nblayer, file);
+  r = fread(layers, sizeof(unsigned), nblayer, file);
+	if(r == 0)
+		return NULL;
 
   network *n = newNetwork(nblayer, layers);
 
   //**threshold
-  for(unsigned k = 0; k < n->nblayer - 1; k++)
-    fread(n->threshold[k], sizeof(float), n->layers[k + 1], file);
+  for(unsigned k = 0; k < n->nblayer - 1; k++){
+    r = fread(n->threshold[k], sizeof(float), n->layers[k + 1], file);
+		if (r == 0)
+			return NULL;
+	}
 
   //***weight
   for(unsigned k = 0; k < n->nblayer - 1; k++)
-    for(unsigned l = 0; l < n->layers[k]; l++)
-      fread(n->weight[k][l], sizeof(float), n->layers[k + 1], file);
-
+    for(unsigned l = 0; l < n->layers[k]; l++){
+      r = fread(n->weight[k][l], sizeof(float), n->layers[k + 1], file);
+			if (r == 0)
+				return NULL;
+		}
   fclose(file);
 
   return n;

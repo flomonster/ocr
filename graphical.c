@@ -39,35 +39,24 @@ typedef struct
 }Zone;
 
 /**
- *\brief Convert a constant string to a double
+ *\brief Convert a constant string to an integer
  *
  *\param s The constant string to convert
 */
-double a2i(const char *s)
+int a2i(const char *s)
 {
- 	double sign=1;
-	double div = 1;
+ 	int sign=1;
  	if(*s == '-'){
  		sign = -1;
  		s++;
 	}
-	else if(*s == '+')
-		s++;
- 	double num=0;
- 	while(*s && *s != '.')
+ 	int num=0;
+ 	while(*s && *s != '.' && *s != '\0')
   {
    	num=((*s)-'0')+num*10;
     s++;   
   }
-	if(*s)
-		s++;
-	while(*s)
-  {
-    num=((*s)-'0')+num*10;
-		div *= 10;
-    s++;
-  }
- 	return num*sign / div;
+ 	return num*sign;
 }
 
 /**
@@ -82,30 +71,36 @@ void rotation(GtkWidget *window, gpointer data){
 	GtkWidget* pBox;
   GtkWidget* pEntry;
   const char* angle;
+	printf("OK");
   pBox = gtk_dialog_new_with_buttons("Choose rotation angle",
       GTK_WINDOW(pWindow),
       GTK_DIALOG_MODAL,
-      GTK_STOCK_OK,GTK_RESPONSE_OK,
-      GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
+      "_Ok",GTK_RESPONSE_OK,
+      "_Cancel",GTK_RESPONSE_CANCEL,
       NULL);
  
   pEntry = gtk_entry_new();
+	printf("OK2");
   gtk_entry_set_text(GTK_ENTRY(pEntry), "0");
   GtkWidget *vBox = gtk_dialog_get_content_area(GTK_DIALOG(pBox));
 	gtk_box_pack_start(GTK_BOX(vBox), pEntry, TRUE, FALSE, 0);
-  
+  printf("OK BOX");
 	gtk_widget_show_all(vBox);
   switch (gtk_dialog_run(GTK_DIALOG(pBox)))
   {
       case GTK_RESPONSE_OK:
           angle = gtk_entry_get_text(GTK_ENTRY(pEntry));
-					double ang = a2i(angle);
+					printf("OK ENTRY");
+					int ang = a2i(angle);
+					printf("OK ANGLE");
 					bitmap *img = loadBmp(zone->path);
-					rotate(img, ang);
+					printf("OK LOAD");
+					rotate(img, (double)ang);
+					printf("OK ROTATE");
 					char *path = "pictureRotate.bmp";
 					saveBmp(path, img);
+					printf("OK SAVE");
 					gtk_image_set_from_file(GTK_IMAGE(zone->image), path);
-					free(path);
           break;
       /* L utilisateur annule */
       case GTK_RESPONSE_CANCEL:
@@ -177,13 +172,7 @@ void process(GtkWidget *window, gpointer data){
 				binarize(letter);
 				draw(letter);
 				c = ocr(letter, n);
-				if(c > 127){
-					txt[i] = (c & 0x3F) | 0x80;
-					i++;
-					txt[i] = (c >> 6) | 0xC0;
-				}
-				else
-					txt[i] = c;
+				txt[i] = c;
 				freeBitmap(letter);
 				i++;
 			}
