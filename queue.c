@@ -1,3 +1,9 @@
+/**
+ * \file main.c
+ * \brief dynamic storage
+ * \author issarn_t
+ * \date 09/29/2016
+ */
 # include "queue.h"
 
 /**
@@ -13,8 +19,8 @@ queue *newQueue()
 /**
  * \brief  Append element to a queue
  *
- * \param q: the queue to be modified
- * \param obj: the element to be added
+ * \param q the queue to be modified
+ * \param obj the element to be added
  */
 void enQueue(queue *q, void *obj)
 {
@@ -32,7 +38,7 @@ void enQueue(queue *q, void *obj)
 /**
  * \brief Remove and give you the first element of a queue
  *
- * \param q: the queue to be  modified
+ * \param q the queue to be  modified
  */
 void *deQueue(queue *q)
 {
