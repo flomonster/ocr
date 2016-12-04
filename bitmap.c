@@ -78,7 +78,7 @@ bitmap *newBitmap(unsigned width, unsigned height, color *content)
 /**
  * \brief free the bitmap
  *
- * \param bitmap *img the bitmap to free
+ * \param img the bitmap to free
  */
 
 void freeBitmap(bitmap *img)
@@ -223,8 +223,8 @@ bitmap *loadBmp(char *path)
 /*
  * \brief save the bmp with the path name
  *
- * \param bitmap *img : the bitmap
- * \param char *path the name of the saved bmp
+ * \param bmp the picture that we want to save
+ * \param path the name for the saved picture
 */
 
 void saveBmp(char *path, bitmap *bmp)
@@ -257,7 +257,7 @@ void saveBmp(char *path, bitmap *bmp)
 /*
  * \brief Equalize the histogram of the bitmap to raise the contrast
  *
- * \param bitmap *img : the bitmap
+ * \param img the bitmap
 */
 void autoContrast(bitmap *img)
 {
@@ -323,8 +323,8 @@ void autoContrast(bitmap *img)
 /*
  * \brief rotate the bmp by angle degree
  *
- * \param bitmap *ing the bmp to rotate
- * \param double angle the angle of the rotation, in degree
+ * \param img the picture to rotate
+ * \param angle the angle of the rotation, in degree
  */
 
 void rotate(bitmap *img, double angle)
@@ -337,11 +337,7 @@ void rotate(bitmap *img, double angle)
   unsigned x, y;
   double x2, y2;
   for (unsigned i = 0; i < n; i++)
-  {
-    content[i].r = 255;
-    content[i].g = 255;
-    content[i].b = 255;
-  }
+    content[i] = newColor(255, 255 , 255);
   for (unsigned i = 0; i < n; i++)
   {
     x = i % img->width;
@@ -352,21 +348,10 @@ void rotate(bitmap *img, double angle)
     y2 = - sin(angle) * ((double)x  - (double)img->width / 2);
     y2 += cos(angle) * ((double)y - (double)img->height / 2);
     y2 += (double)img->height / 2;
-    //x2 = x - tan(angle / 2) * y;
-    //y2 = y;
 
-    //x2 = x2;
-    //y2 = y2 + sin(angle) * x2;
-
-    //x2 = x2 - tan(angle / 2) * y2;
-    //y2 = y2;
     if (x2 >= 0 && x2 < (double)img->width)
-    {
       if (y2 >= 0 && y2 < (double)img->height)
-      {
         content[(unsigned)y2 * img->width + (unsigned)x2] = img->content[i];
-      }
-    }
   }
   free(img->content);
   img->content = content;
