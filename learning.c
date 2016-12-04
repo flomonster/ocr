@@ -93,11 +93,12 @@ void learning(char *learnFiles[], size_t nbFile)
     size_t i = 0;
 
     FILE *fp = fopen(learnFiles[j] ,"r");
-    do
+    int r;
+		do
     {
-      fread(pathImg + i, 1, 1, fp);
+      r = fread(pathImg + i, 1, 1, fp);
       i++;
-    } while (pathImg[i-1] != '\n');
+    } while (r !=0 && pathImg[i-1] != '\n');
     pathImg[i-1] = 0;
     fclose(fp);
     
@@ -118,13 +119,16 @@ void learning(char *learnFiles[], size_t nbFile)
 
   char text[length + 1];
   size_t i = 0;
+	int r;
   for (size_t j = 0; j < nbFile; j++)
   {
     FILE *fp = fopen(learnFiles[j] ,"r");
     text[i] = ' ';
-    while (text[i] != '\n')
-      fread(text + i, 1, 1, fp);
-
+    while (text[i] != '\n'){
+      r = fread(text + i, 1, 1, fp);
+			if (r == 0)
+				return;
+		}
     while (fread(text + i, 1, 1, fp))
       if (text[i] != '\n' && text[i] != ' ')
         i++;
