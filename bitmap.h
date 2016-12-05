@@ -13,11 +13,15 @@
 # include <stdlib.h>
 
 # pragma pack(push, 1)
+/**
+ * \struct s_color
+ * \brief The color of a pixel in a bitmap
+ */
 struct s_color
 {
-  unsigned char b;
-  unsigned char g;
-  unsigned char r;
+  unsigned char b; /*!< Th blue color */
+  unsigned char g; /*!< The green color */
+  unsigned char r; /*!< The red color */
 };
 # pragma pack(pop)
 typedef struct s_color color;
@@ -30,15 +34,18 @@ typedef struct s_color color;
  * \param g green component of the new color
  * \param b blue component of the new color
  */
-
 color newColor(unsigned char, unsigned char, unsigned char);
 
 # pragma pack(push, 1)
+/**
+ * \struct s_bitmap
+ * \brief A picture
+ */
 struct s_bitmap
 {
-  unsigned width;
-  unsigned height;
-  color *content;
+  unsigned width; /*!< The width of the picture */
+  unsigned height; /*!< The height of the picture */
+  color *content; /*!< The table of color */
 };
 # pragma pack(pop)
 
@@ -51,7 +58,6 @@ typedef struct s_bitmap bitmap;
  * \param height is the height of the new bitmap
  * \param content is the full image
  */
-
 bitmap *newBitmap(unsigned, unsigned, color *);
 
 
@@ -60,7 +66,6 @@ bitmap *newBitmap(unsigned, unsigned, color *);
  *
  * \param img the bitmap to free
  */
-
 void freeBitmap(bitmap *);
 
 struct s_bitmapFileHeader;
@@ -74,7 +79,6 @@ typedef struct s_bitmapInfoHeader bitmapInfoHeader;
  *
  * \param img the image which will be draw
  */
-
 void draw(bitmap *);
 
 /**
@@ -82,7 +86,6 @@ void draw(bitmap *);
  *
  * \param img the image which will be binarize
  */
-
 void binarize(bitmap *);
 
 /**
@@ -90,7 +93,6 @@ void binarize(bitmap *);
  *
  * \pram img the image which will be resize
  */
-
 void resize(bitmap *);
 
 /**
@@ -98,7 +100,6 @@ void resize(bitmap *);
  *
  * \param path is image path
  */
-
 bitmap *loadBmp(char *);
 
 /**
@@ -107,7 +108,6 @@ bitmap *loadBmp(char *);
  * \param img the picture to save
  * \param path the name for the saved picture
  */
-
 void saveBmp(char *, bitmap *);
 
 /**
@@ -115,7 +115,6 @@ void saveBmp(char *, bitmap *);
  *
  * \param img the bitmap to contrast
  */
-
 void autoContrast(bitmap *);
 
 /**
@@ -124,6 +123,5 @@ void autoContrast(bitmap *);
  * \param img the bitmap to rotate
  * \param angle the angle of the rotation, in degree
  */
-
 void rotate(bitmap *, double);
 # endif
