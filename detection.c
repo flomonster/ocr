@@ -170,7 +170,8 @@ void colorRectangle(bitmap *src, int x, int y, unsigned width,
 void segmentation(bitmap *img, size_t *nbCharacter,
     size_t *nbLetter, queue *q, bitmap *cutedImage, int pos)
 {
- 
+  *nbCharacter = 0;
+  *nbLetter = 0;
   bitmap *bmp = binerizeCopy(img);
   char lineMarker[cutedImage->height];
   char columnMarker[cutedImage->width];
