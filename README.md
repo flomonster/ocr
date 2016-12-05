@@ -1,14 +1,20 @@
-## OCR
+## Optical Character Recognition
 
 This software car recognize text in images.
 
 * Utilization :
 
+  * Graphical :
+```
+./main
+```
+
+  * Terminal :
+
 ```
 ./main 2 [img path]
 ```
 
-* Learning :
+    * Generating a new `network.save` : ```./main 0```
 
-  * Generating a new `network.save` : ```./main 0```
-  * Learning : ```./main 1 [learning file]```
+    * Learning : ```./main 1 [learning file]```
