@@ -1,6 +1,6 @@
 /**
  * \file detection.h 
- * \brief Detect text and only it in a image
+ * \brief The header of detection.c
  * \author issarn_t
  * \date 09/17/2016
  */

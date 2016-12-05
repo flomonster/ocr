@@ -1,5 +1,5 @@
 /**
- * \file main.c
+ * \file detection.c
  * \brief Detect text and only it in a text 
  * \author issarn_t
  * \date 09/17/2016

@@ -1,3 +1,9 @@
+/**
+ * \file learning.c
+ * \brief All functions for learn and use a neural network
+ * \author amsall_f
+ * \date 09/17/2016
+ */
 # include <stdio.h>
 # include <stdlib.h>
 # include <time.h>
@@ -17,7 +23,6 @@
  * \param result the table of results
  * \param length the length of both table
  */
-
 void shuffleSample(float **samples, float **results, unsigned length)
 {
   for (unsigned i = length - 1; i > 0; i--)

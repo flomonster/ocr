@@ -1,3 +1,9 @@
+/**
+ * \file network.c
+ * \brief Create, detroy, load and save a neural network 
+ * \author amsall_f and astain_d
+ * \date 09/17/2016
+ */
 # include <stdio.h>
 # include <stdlib.h>
 # include <err.h>
