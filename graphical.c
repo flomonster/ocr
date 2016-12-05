@@ -74,7 +74,7 @@ void rotation(GtkWidget *window, gpointer data){
 	saveBmp(path, img);
 	zone->path = path;
 	gtk_image_set_from_file(GTK_IMAGE(zone->image), path);
-	GError *error;
+	GError *error = NULL;
 	GdkPixbuf *pixbuf = gtk_image_get_pixbuf(GTK_IMAGE(zone->image));
 	gdk_pixbuf_save(pixbuf, path, "bmp", &error, NULL);
 	(void)window;
