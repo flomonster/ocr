@@ -8,11 +8,12 @@
  * buttons with the functions to launch. 
  */
 
-
+# include <gdk-pixbuf/gdk-pixbuf.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <err.h>
 # include <time.h>
+# include <unistd.h>
 # include <gtk/gtk.h>
 # include "ocr.h"
 # include "bitmap.h"
@@ -67,48 +68,15 @@ int a2i(const char *s)
 */
 void rotation(GtkWidget *window, gpointer data){
 	Zone *zone = (Zone *)data;
-	GtkWidget *pWindow = zone->pWindow;
-	GtkWidget* pBox;
-  GtkWidget* pEntry;
-  const char* angle;
-	printf("OK");
-  pBox = gtk_dialog_new_with_buttons("Choose rotation angle",
-      GTK_WINDOW(pWindow),
-      GTK_DIALOG_MODAL,
-      "_Ok",GTK_RESPONSE_OK,
-      "_Cancel",GTK_RESPONSE_CANCEL,
-      NULL);
- 
-  pEntry = gtk_entry_new();
-	printf("OK2");
-  gtk_entry_set_text(GTK_ENTRY(pEntry), "0");
-  GtkWidget *vBox = gtk_dialog_get_content_area(GTK_DIALOG(pBox));
-	gtk_box_pack_start(GTK_BOX(vBox), pEntry, TRUE, FALSE, 0);
-  printf("OK BOX");
-	gtk_widget_show_all(vBox);
-  switch (gtk_dialog_run(GTK_DIALOG(pBox)))
-  {
-      case GTK_RESPONSE_OK:
-          angle = gtk_entry_get_text(GTK_ENTRY(pEntry));
-					printf("OK ENTRY");
-					int ang = a2i(angle);
-					printf("OK ANGLE");
-					bitmap *img = loadBmp(zone->path);
-					printf("OK LOAD");
-					rotate(img, (double)ang);
-					printf("OK ROTATE");
-					char *path = "pictureRotate.bmp";
-					saveBmp(path, img);
-					//free(zone->path);
-					zone->path = path;
-					printf("OK SAVE");
-					gtk_image_set_from_file(GTK_IMAGE(zone->image), path);
-          break;
-      /* L utilisateur annule */
-      case GTK_RESPONSE_CANCEL:
-					break;
-  }
-	gtk_widget_destroy(pBox);
+	bitmap *img = loadBmp(zone->path);
+	rotate(img, -5);
+	char *path = "pictureRotate.bmp";
+	saveBmp(path, img);
+	zone->path = path;
+	gtk_image_set_from_file(GTK_IMAGE(zone->image), path);
+	GError *error;
+	GdkPixbuf *pixbuf = gtk_image_get_pixbuf(GTK_IMAGE(zone->image));
+	gdk_pixbuf_save(pixbuf, path, "bmp", &error, NULL);
 	(void)window;
 }
 
@@ -132,34 +100,9 @@ void process(GtkWidget *window, gpointer data){
 	char txt[*length + 1];
 	txt[*length] = 0;
 	char c;
-	printf("OK");
-	GtkWidget *messageDialog = gtk_message_dialog_new(GTK_WINDOW(zone->pWindow),
-									GTK_DIALOG_MODAL, GTK_MESSAGE_INFO,
-									GTK_BUTTONS_CLOSE, 
-"Here is the new image.\n Please click to proceed to next step.");
-	g_signal_connect_swapped(messageDialog, "response", 
-									G_CALLBACK(gtk_widget_destroy), messageDialog);
-	gtk_dialog_run(GTK_DIALOG(messageDialog));
-	printf("OK BOX");
 	gtk_image_set_from_file(GTK_IMAGE(zone->image), "fusion.bmp");
-	printf("OK LOAD");
-	messageDialog = gtk_message_dialog_new(GTK_WINDOW(zone->pWindow),
-                  GTK_DIALOG_MODAL, GTK_MESSAGE_INFO,
-                  GTK_BUTTONS_CLOSE,
-"Here is the new image.\n Please click to proceed to next step.");
-  g_signal_connect_swapped(messageDialog, "response",
-                  G_CALLBACK(gtk_widget_destroy), messageDialog);
-	gtk_dialog_run(GTK_DIALOG(messageDialog));
 	gtk_image_set_from_file(GTK_IMAGE(zone->image), "rlsaImage.bmp");
-	messageDialog = gtk_message_dialog_new(GTK_WINDOW(zone->pWindow),
-                  GTK_DIALOG_MODAL, GTK_MESSAGE_INFO,
-                  GTK_BUTTONS_CLOSE,
-"Here is the new image.\n Please click to proceed to next step.");
-  g_signal_connect_swapped(messageDialog, "response",
-                  G_CALLBACK(gtk_widget_destroy), messageDialog);
-	gtk_dialog_run(GTK_DIALOG(messageDialog));
 	gtk_image_set_from_file(GTK_IMAGE(zone->image), "segmented.bmp");
-	gtk_dialog_run(GTK_DIALOG(messageDialog));
 	while (q->length > 0)
 	{
 		queue *line = deQueue(q);
